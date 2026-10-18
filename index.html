@@ -133,6 +133,46 @@ dialog::backdrop{background:rgba(5,8,20,.65)}
 .cm .txt{overflow-wrap:anywhere;white-space:pre-wrap;font-size:15px}
 .cm .del{border:0;background:none;color:var(--muted);font:600 12px var(--f-body);padding:2px 6px;flex:none}
 .cm .del:hover{color:var(--fg)}
+.nav{display:flex;gap:4px;margin-top:14px;border-bottom:1px solid var(--line);overflow-x:auto}
+.nav button{border:0;background:none;padding:10px 18px;font:700 15px var(--f-body);color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.nav button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--accent)}
+.form select{height:42px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--fg);padding:0 10px;font:500 16px var(--f-body)}
+.feed{height:min(calc(100vh - 190px),780px);height:min(calc(100dvh - 190px),780px);min-height:360px;overflow-y:auto;scroll-snap-type:y mandatory;margin-top:12px;scrollbar-width:none}
+.feed::-webkit-scrollbar{display:none}
+.short{position:relative;height:100%;scroll-snap-align:start;scroll-snap-stop:always;display:flex;justify-content:center;align-items:center;padding:6px 0}
+.sv{position:relative;height:100%;aspect-ratio:9/16;max-width:100%;background:#000;border-radius:18px;overflow:hidden;cursor:pointer}
+.sv video{width:100%;height:100%;object-fit:cover;display:block}
+.sov{position:absolute;left:0;right:0;bottom:0;padding:48px 14px 14px;background:linear-gradient(transparent,rgba(0,0,0,.78));color:#fff;pointer-events:none}
+.sov .title{color:#fff;font:700 15px var(--f-body)}
+.sov .sub{color:rgba(255,255,255,.8);font-size:13px}
+.sside{align-self:flex-end;margin:0 0 20px 14px;display:flex;flex-direction:column;gap:12px}
+.sbtn{width:48px;height:48px;border-radius:50%;border:0;background:var(--surface-2);color:var(--fg);display:grid;place-items:center}
+.sbtn:hover{filter:brightness(1.1)}
+@media (max-width:640px){.sside{position:absolute;right:12px;bottom:84px;margin:0}.sbtn{background:rgba(0,0,0,.55);color:#fff}}
+.short.loading .sv::after,.short.fail .sv::after{content:"Cargando…";position:absolute;inset:0;display:grid;place-items:center;color:#fff;background:rgba(0,0,0,.45);font:600 14px var(--f-body)}
+.short.fail .sv::after{content:"No se pudo cargar el short"}
+.cview{max-width:680px;margin:18px auto 0}
+.composer{display:flex;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:18px}
+.composer .av{width:40px;height:40px}
+.pc{flex:1;min-width:0}
+.pc textarea{width:100%;resize:vertical;min-height:56px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--fg);padding:10px 12px;font:500 15px var(--f-body)}
+.pc textarea:focus{outline:0;border-color:var(--accent)}
+.pprev img{max-width:100%;max-height:220px;border-radius:10px;display:block;margin-top:8px}
+.pbtns{display:flex;gap:8px;justify-content:flex-end;align-items:center;margin-top:8px;flex-wrap:wrap}
+label.btn{display:inline-flex;align-items:center;cursor:pointer}
+.post{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px}
+.phead{display:flex;gap:10px;align-items:center}
+.phead .av{width:40px;height:40px}
+.pwho b{font:700 14px var(--f-body)}
+.pwho .when{color:var(--muted);margin-left:8px;font-size:12px}
+.post .del{border:0;background:none;color:var(--muted);font:600 12px var(--f-body);padding:2px 6px;margin-left:auto}
+.ptxt{margin-top:10px;white-space:pre-wrap;overflow-wrap:anywhere}
+.pimg{width:100%;max-height:480px;object-fit:contain;border-radius:10px;margin-top:10px;background:var(--bg);display:block}
+.pact{display:flex;gap:8px;margin-top:12px}
+.pact button{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:6px 14px;font:600 13px var(--f-body);color:var(--muted)}
+.pact button.on{color:#e0245e;border-color:#e0245e}
+.pact button.on2{background:var(--surface-2);color:var(--fg)}
+.pcm{margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
@@ -150,8 +190,22 @@ dialog::backdrop{background:rgba(5,8,20,.65)}
     </div>
   </header>
 
+  <nav class="nav" id="tabs" aria-label="Secciones"><button type="button" data-t="home" aria-selected="true">Inicio</button><button type="button" data-t="shorts" aria-selected="false">Shorts</button><button type="button" data-t="comm" aria-selected="false">Comunidad</button></nav>
   <div class="controls" id="controls"></div>
   <main class="grid" id="grid" aria-live="polite"></main>
+  <section id="shortsView" hidden></section>
+  <section class="cview" id="commView" hidden>
+    <form class="composer" id="pform" autocomplete="off">
+      <div class="av" id="pav">?</div>
+      <div class="pc">
+        <textarea id="ptext" maxlength="1000" rows="2" placeholder="Comparte algo con la comunidad…" aria-label="Escribe una publicación"></textarea>
+        <div class="pprev" id="pprev" hidden><img id="pimgel" alt=""><button type="button" class="btn" id="pimgx" style="height:32px;margin-top:6px">Quitar imagen</button></div>
+        <p class="err" id="perr" role="alert"></p>
+        <div class="pbtns"><label class="btn" for="pfile">Añadir imagen</label><input type="file" id="pfile" accept="image/*" hidden><button class="btn primary" type="submit" id="psend">Publicar</button></div>
+      </div>
+    </form>
+    <div id="pfeed"></div>
+  </section>
 </div>
 
 <dialog id="watch" aria-label="Reproductor"><button class="close" id="wclose" aria-label="Cerrar">×</button><div class="watch"><div class="stage"><div class="player" id="player"></div><h2 id="wtitle"></h2><div class="row"><div class="av" id="wav"></div><div class="meta"><div class="title" id="wch"></div><div class="sub" id="wsub"></div></div></div>
@@ -163,6 +217,7 @@ dialog::backdrop{background:rgba(5,8,20,.65)}
   <h2>Subir video</h2>
   <label for="f-title">Título<input type="text" id="f-title" required maxlength="120" placeholder="Ej. Mi primer video"></label>
   <label for="f-ch">Tu canal (tu cuenta)<input type="text" id="f-ch" readonly></label>
+  <label for="f-kind">Tipo<select id="f-kind"><option value="v">Video</option><option value="s">Short (vertical, máximo 60 segundos)</option></select></label>
   <label for="f-file">Archivo de video<input type="file" id="f-file" accept="video/*"></label>
   <p class="hint">En esta versión el video se reproduce solo en tu navegador mientras la página esté abierta. Al recargar desaparece.</p>
   <div class="btns"><button type="button" class="btn" id="fcancel">Cancelar</button><button type="submit" class="btn primary">Publicar</button></div>
@@ -240,7 +295,7 @@ function thumb(v,small){
 }
 function list(){
   var q=norm(term);
-  var a=VIDEOS.filter(function(v){return (!chan||v.c===chan)&&(!q||norm(v.t+" "+v.c).indexOf(q)>-1)});
+  var a=VIDEOS.filter(function(v){return !v.short&&(!chan||v.c===chan)&&(!q||norm(v.t+" "+v.c).indexOf(q)>-1)});
   a.sort(function(x,y){return sort==="views"?(y.v-x.v)||(x.d-y.d):(x.d-y.d)||(y.v-x.v)});
   return a;
 }
@@ -252,6 +307,7 @@ function controls(n){
   c.appendChild(el("span","count",n+(n===1?" video":" videos")));
 }
 function render(){
+  if(tab==="shorts")renderShorts(false);
   var a=list(),g=$("#grid");g.innerHTML="";controls(a.length);
   if(!a.length){var e=el("div","empty");e.appendChild(el("b",null,"No hay videos"));e.appendChild(document.createTextNode("Prueba con otra palabra o sube el primero."));g.appendChild(e);return}
   a.forEach(function(v){
@@ -267,7 +323,7 @@ function render(){
   });
 }
 function open(v){
-  v.v++;cur=v;if(v.fid&&db)db.collection("videos").doc(v.fid).update({views:firebase.firestore.FieldValue.increment(1)}).catch(function(){});
+  cur=v;bump(v);
   var pl=$("#player");pl.innerHTML="";pl.style.padding="";pl.style.position="";
   if(v.url||v.blobUrl){playSrc(pl,v.url||v.blobUrl)}
   else if(v.fid&&v.chunks>0){pl.style.padding="16px";var ld=el("p",null,"Cargando video…");pl.appendChild(ld);
@@ -280,7 +336,7 @@ function open(v){
   var av=$("#wav");av.textContent=initial(v.c);av.style.background="";av.style.setProperty("--h",hue(v.c));fillAv(av,v.c);
   $("#wsub").textContent=views(v.v)+" · "+ago(v.d);
   var n=$("#next");n.innerHTML="";
-  VIDEOS.filter(function(x){return x!==v}).sort(function(x,y){return y.v-x.v}).slice(0,6).forEach(function(x){
+  VIDEOS.filter(function(x){return x!==v&&!x.short}).sort(function(x,y){return y.v-x.v}).slice(0,6).forEach(function(x){
     var b=el("button","next");b.appendChild(thumb(x,true));
     var m=el("div","meta");m.appendChild(el("div","title",x.t));m.appendChild(el("div","sub",x.c+" · "+views(x.v)));b.appendChild(m);
     b.onclick=function(){open(x)};n.appendChild(b)});
@@ -299,26 +355,29 @@ $("#up").onclick=function(){
 $("#fcancel").onclick=function(){$("#uploadDlg").close()};
 $("#form").addEventListener("submit",function(e){
   e.preventDefault();
-  var t=$("#f-title").value.trim(),c=me,f=$("#f-file").files[0];
+  var t=$("#f-title").value.trim(),c=me,f=$("#f-file").files[0],sh=$("#f-kind").value==="s";
   if(!t||!c)return;
-  if(CLOUD){
-    if(f&&f.size>MAXV){toast("El video pesa más de 10 MB.");return}
-    var sb=$("#form button[type=submit]");
-    publishCloud(t,f).then(function(){
-      $("#form").reset();$("#uploadDlg").close();chan="";term="";$("#q").value="";sort="rec";render();
-      toast(f?"Video publicado":"Publicado sin archivo de video");
-    },function(er){toast(er&&er.code==="permission-denied"?"Sin permiso: faltan las reglas nuevas de Firestore":"No se pudo publicar el video")})
-    .then(function(){sb.textContent="Publicar";sb.disabled=false});
-    return;
-  }
-  var v={id:nextId++,c:c,t:t,d:0,v:0};
-  if(f)v.url=URL.createObjectURL(f);
-  VIDEOS.unshift(v);$("#form").reset();$("#uploadDlg").close();
-  chan="";term="";$("#q").value="";sort="rec";render();
-  toast(f?"Video publicado":"Publicado sin archivo de video");
+  if(sh&&!f){toast("Un short necesita un archivo de video.");return}
+  if(CLOUD&&f&&f.size>MAXV){toast("El video pesa más de 10 MB.");return}
+  var sb=$("#form button[type=submit]");sb.disabled=true;
+  (sh?vidDur(f):Promise.resolve(0)).then(function(dur){
+    if(sh&&dur>61){toast("Los shorts duran máximo 60 segundos.");sb.disabled=false;return}
+    var done=function(){
+      $("#form").reset();$("#uploadDlg").close();chan="";term="";$("#q").value="";sort="rec";setTab(sh?"shorts":"home");render();
+      toast(sh?"Short publicado":(f?"Video publicado":"Publicado sin archivo de video"));
+    };
+    if(CLOUD){
+      publishCloud(t,f,sh).then(done,function(er){toast(er&&er.code==="permission-denied"?"Sin permiso: faltan las reglas nuevas de Firestore":"No se pudo publicar el video")})
+      .then(function(){sb.textContent="Publicar";sb.disabled=false});
+    }else{
+      var v={id:nextId++,c:c,t:t,d:0,v:0,short:sh,ts:Date.now()};
+      if(f)v.url=URL.createObjectURL(f);
+      VIDEOS.unshift(v);done();sb.disabled=false;
+    }
+  });
 });
 $("#uploadDlg").addEventListener("click",function(e){if(e.target===this)this.close()});
-$("#q").addEventListener("input",function(e){term=e.target.value;render()});
+$("#q").addEventListener("input",function(e){term=e.target.value;if(tab!=="home")setTab("home");render()});
 $("#theme").onclick=function(){var r=document.documentElement,dark=r.dataset.theme?r.dataset.theme==="dark":matchMedia("(prefers-color-scheme:dark)").matches;r.dataset.theme=dark?"light":"dark"};
 
 /* ===== Cuentas =====
@@ -388,7 +447,7 @@ function loadCloud(){
       if(!u){me=null;refreshAcct();return}
       loadProfile(u).then(function(){refreshAcct();render()},function(){me=null;refreshAcct()});
     });
-    render();startVideos();
+    render();startVideos();if(tab==="comm")postsSub();
   });
   ready.catch(function(){});
 }
@@ -422,13 +481,13 @@ function startVideos(){
     sn.forEach(function(d){
       var o=d.data(),prev=old[d.id];
       add.push({id:"f"+d.id,fid:d.id,c:o.channel,t:o.title,d:Math.max(0,Math.floor((Date.now()-o.ts)/864e5)),v:o.views||0,
-        img:o.thumb||"",chunks:o.hasFile?o.chunks:0,mime:o.mime||"video/mp4",blobUrl:prev&&prev.blobUrl||""});
+        img:o.thumb||"",chunks:o.hasFile?o.chunks:0,mime:o.mime||"video/mp4",short:o.short===true,ts:o.ts,blobUrl:prev&&prev.blobUrl||""});
     });
     VIDEOS=add.concat(keep);render();
   },function(){});
 }
 function readB64(blob){return new Promise(function(ok,no){var r=new FileReader();r.onload=function(){ok(String(r.result).split(",")[1]||"")};r.onerror=no;r.readAsDataURL(blob)})}
-function genThumb(f){
+function genThumb(f,portrait){
   return new Promise(function(ok){
     var u=URL.createObjectURL(f),v=document.createElement("video"),done=false;
     function fin(x){if(done)return;done=true;URL.revokeObjectURL(u);ok(x||"")}
@@ -437,9 +496,9 @@ function genThumb(f){
     v.onseeked=function(){
       try{
         if(!v.videoWidth)return fin("");
-        var W=320,H=180,c=document.createElement("canvas");c.width=W;c.height=H;
+        var W=portrait?180:320,H=portrait?320:180,c=document.createElement("canvas");c.width=W;c.height=H;
         var x=c.getContext("2d");x.fillStyle="#000";x.fillRect(0,0,W,H);
-        var r=Math.min(W/v.videoWidth,H/v.videoHeight),w=v.videoWidth*r,h=v.videoHeight*r;
+        var r=Math[portrait?"max":"min"](W/v.videoWidth,H/v.videoHeight),w=v.videoWidth*r,h=v.videoHeight*r;
         x.drawImage(v,(W-w)/2,(H-h)/2,w,h);
         var d=c.toDataURL("image/jpeg",.7);if(d.length>55000)d=c.toDataURL("image/jpeg",.4);
         fin(d.length<58000?d:"");
@@ -448,7 +507,7 @@ function genThumb(f){
     v.onerror=function(){fin("")};setTimeout(function(){fin("")},6000);v.src=u;
   });
 }
-function publishCloud(t,f){
+function publishCloud(t,f,sh){
   var ref=db.collection("videos").doc(),CH=520000,n=f?Math.ceil(f.size/CH):0,done=0,uid=auth.currentUser.uid,btn=$("#form button[type=submit]");
   btn.disabled=true;
   function prog(){btn.textContent=n?("Subiendo "+done+"/"+n+"…"):"Publicando…"}
@@ -457,7 +516,7 @@ function publishCloud(t,f){
   }
   function clean(){var a=[];for(var i=0;i<n;i++)a.push(ref.collection("chunks").doc(String(i))["delete"]().catch(function(){}));return Promise.all(a)}
   prog();
-  return (f?genThumb(f):Promise.resolve("")).then(function(thumb){
+  return (f?genThumb(f,sh):Promise.resolve("")).then(function(thumb){
     var i=0;
     function next(){
       if(i>=n)return Promise.resolve();
@@ -465,7 +524,7 @@ function publishCloud(t,f){
       return Promise.all(grp).then(next);
     }
     return next().then(function(){
-      return ref.set({title:t,channel:me,uid:uid,ts:Date.now(),views:0,thumb:thumb,size:f?f.size:0,chunks:n,hasFile:!!f,mime:f&&f.type||"video/mp4"});
+      return ref.set({title:t,channel:me,uid:uid,ts:Date.now(),views:0,thumb:thumb,size:f?f.size:0,chunks:n,hasFile:!!f,mime:f&&f.type||"video/mp4",short:!!sh});
     });
   }).catch(function(er){return clean().then(function(){throw er})});
 }
@@ -528,6 +587,196 @@ $("#cform").addEventListener("submit",function(e){
   job.then(function(){$("#ctext").value=""},function(er){toast(er&&er.code==="permission-denied"?"Sin permiso: faltan las reglas nuevas de Firestore":"No se pudo publicar el comentario")}).then(function(){btn.disabled=false});
 });
 
+
+/* ---- pestañas: Inicio / Shorts / Comunidad ---- */
+var tab="home",sIO=null,sSig="",CP=[],LP=[],LPC={},punsub=null,openC={},bunsubs=[],pimg="",cdraft={};
+function bump(v){v.v++;if(v.fid&&db)db.collection("videos").doc(v.fid).update({views:firebase.firestore.FieldValue.increment(1)}).catch(function(){})}
+function emptyBox(b,t){var e=el("div","empty");e.appendChild(el("b",null,b));e.appendChild(document.createTextNode(t));return e}
+function vidDur(f){return new Promise(function(ok){var u=URL.createObjectURL(f),v=document.createElement("video");v.preload="metadata";
+  v.onloadedmetadata=function(){var d=v.duration;URL.revokeObjectURL(u);ok(d||0)};v.onerror=function(){URL.revokeObjectURL(u);ok(0)};setTimeout(function(){ok(0)},5000);v.src=u})}
+function readImage(file,max){
+  return new Promise(function(ok,no){
+    if(!file||!/^image\//.test(file.type))return no(new Error("Elige un archivo de imagen."));
+    var url=URL.createObjectURL(file),im=new Image();
+    im.onload=function(){
+      var r=Math.min(1,max/Math.max(im.width,im.height)),w=Math.round(im.width*r),h=Math.round(im.height*r),c=document.createElement("canvas");
+      c.width=w;c.height=h;c.getContext("2d").drawImage(im,0,0,w,h);URL.revokeObjectURL(url);
+      var d=c.toDataURL("image/jpeg",.8);if(d.length>190000)d=c.toDataURL("image/jpeg",.5);
+      d.length>190000?no(new Error("La imagen es demasiado grande.")):ok(d);
+    };
+    im.onerror=function(){URL.revokeObjectURL(url);no(new Error("No se pudo leer esa imagen."))};
+    im.src=url;
+  });
+}
+function setTab(t){
+  var prev=tab;tab=t;
+  document.querySelectorAll("#tabs button").forEach(function(b){b.setAttribute("aria-selected",String(b.dataset.t===t))});
+  $("#controls").hidden=$("#grid").hidden=t!=="home";
+  $("#shortsView").hidden=t!=="shorts";$("#commView").hidden=t!=="comm";
+  if(prev==="shorts"&&t!=="shorts")pauseShorts();
+  if(prev==="comm"&&t!=="comm")postsUnsub();
+  if(t==="shorts")renderShorts(true);
+  if(t==="comm")postsSub();
+  window.scrollTo(0,0);
+}
+document.querySelectorAll("#tabs button").forEach(function(b){b.onclick=function(){setTab(b.dataset.t)}});
+
+/* ---- Shorts ---- */
+function pauseShorts(){
+  if(sIO)sIO.disconnect();sSig="";
+  document.querySelectorAll("#shortsView video").forEach(function(v){try{v.pause()}catch(e){}});
+}
+function renderShorts(force){
+  var a=VIDEOS.filter(function(v){return v.short}).sort(function(x,y){return (y.ts||0)-(x.ts||0)});
+  var sig=a.map(function(v){return v.id}).join(",");
+  if(!force&&sig===sSig)return;sSig=sig;
+  var box=$("#shortsView");if(sIO)sIO.disconnect();box.innerHTML="";
+  if(!a.length){box.appendChild(emptyBox("Aún no hay shorts","Sube el primero: al subir un video elige «Short» en Tipo."));return}
+  var feed=el("div","feed");
+  a.forEach(function(v){feed.appendChild(shortItem(v))});
+  box.appendChild(feed);
+  sIO=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting&&e.intersectionRatio>=.6)activateShort(e.target);else deactivateShort(e.target)})},{root:feed,threshold:[0,.6,1]});
+  feed.querySelectorAll(".short").forEach(function(n){sIO.observe(n)});
+}
+function shortItem(v){
+  var it=el("div","short");it._v=v;
+  var sv=el("div","sv"),vid=el("video");vid.loop=true;vid.setAttribute("playsinline","");vid.preload="none";if(v.img)vid.poster=v.img;
+  sv.appendChild(vid);
+  var ov=el("div","sov"),row=el("div","row"),av=el("div","av",initial(v.c));av.style.setProperty("--h",hue(v.c));fillAv(av,v.c);
+  var m=el("div","meta");m.appendChild(el("div","title",v.t));m.appendChild(el("div","sub",v.c+" · "+views(v.v)));
+  row.appendChild(av);row.appendChild(m);ov.appendChild(row);sv.appendChild(ov);
+  sv.onclick=function(){if(vid.paused)vid.play().catch(function(){});else vid.pause()};
+  var side=el("div","sside"),cb=el("button","sbtn");cb.type="button";cb.title="Comentarios";cb.setAttribute("aria-label","Comentarios");
+  cb.innerHTML='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.5 7.2L4 20.5l1.4-4.6A8 8 0 1 1 21 12z"/></svg>';
+  cb.onclick=function(e){e.stopPropagation();vid.pause();open(v)};
+  side.appendChild(cb);it.appendChild(sv);it.appendChild(side);
+  return it;
+}
+function activateShort(it){
+  if(it._on)return;it._on=true;
+  var v=it._v,vid=it.querySelector("video");
+  if(!it._counted){it._counted=true;bump(v)}
+  function go(src){
+    if(!it._on)return;
+    if(vid.getAttribute("data-s")!==src){vid.src=src;vid.setAttribute("data-s",src)}
+    vid.play().catch(function(){vid.muted=true;vid.play().catch(function(){})});
+  }
+  var src=v.url||v.blobUrl;
+  if(src)go(src);
+  else if(v.fid&&v.chunks>0){
+    it.classList.remove("fail");it.classList.add("loading");
+    loadVideo(v).then(function(u){it.classList.remove("loading");go(u)},function(){it.classList.remove("loading");it.classList.add("fail")});
+  }
+}
+function deactivateShort(it){if(!it._on)return;it._on=false;var vid=it.querySelector("video");if(vid)vid.pause()}
+
+/* ---- Comunidad ---- */
+function postsSub(){
+  renderComm();
+  if(!CLOUD||punsub||!db)return;
+  punsub=db.collection("posts").orderBy("ts","desc").limit(50).onSnapshot(function(sn){
+    CP=[];sn.forEach(function(d){var o=d.data();CP.push({id:d.id,uid:o.uid,c:o.channel,t:o.text||"",img:o.img||"",ts:o.ts,likes:o.likedBy||[]})});
+    renderComm();
+  },function(){});
+}
+function clearBoxes(){bunsubs.forEach(function(u){try{u()}catch(e){}});bunsubs=[]}
+function postsUnsub(){if(punsub){punsub();punsub=null}clearBoxes()}
+function renderComm(){
+  if(tab!=="comm")return;
+  paintAv($("#pav"),me||"?",me?avSrc(me):"");
+  $("#ptext").placeholder=me?"Comparte algo con la comunidad…":"Inicia sesión para publicar en la comunidad";
+  clearBoxes();
+  var f=$("#pfeed");f.innerHTML="";
+  var a=CLOUD?CP:LP;
+  if(!a.length){f.appendChild(emptyBox("Aún no hay publicaciones","Sé el primero en escribir algo."));return}
+  a.forEach(function(p){f.appendChild(postEl(p))});
+}
+function postEl(p){
+  var d=el("article","post"),h=el("div","phead"),av=el("div","av",initial(p.c));av.style.setProperty("--h",hue(p.c));fillAv(av,p.c);
+  var w=el("div","pwho");w.appendChild(el("b",null,p.c));w.appendChild(el("span","when",agoMs(p.ts)));
+  h.appendChild(av);h.appendChild(w);
+  var mine=CLOUD?!!(auth&&auth.currentUser&&auth.currentUser.uid===p.uid):!!(me&&p.c===me);
+  if(mine){var x=el("button","del","Borrar");x.type="button";x.onclick=function(){delPost(p)};h.appendChild(x)}
+  d.appendChild(h);
+  if(p.t)d.appendChild(el("div","ptxt",p.t));
+  if(p.img){var im=el("img","pimg");im.src=p.img;im.alt="";d.appendChild(im)}
+  var uid=CLOUD?(auth&&auth.currentUser&&auth.currentUser.uid):me,liked=!!uid&&p.likes.indexOf(uid)>-1;
+  var act=el("div","pact"),lk=el("button",liked?"on":null,"♥ "+p.likes.length);lk.type="button";lk.onclick=function(){likePost(p,liked)};
+  var cb=el("button",openC[p.id]?"on2":null,"Comentarios");cb.type="button";cb.onclick=function(){openC[p.id]=!openC[p.id];renderComm()};
+  act.appendChild(lk);act.appendChild(cb);d.appendChild(act);
+  if(openC[p.id])d.appendChild(cbox(p));
+  return d;
+}
+function likePost(p,liked){
+  if(!me){toast("Inicia sesión para dar like");openAuth("in");return}
+  if(CLOUD){
+    var uid=auth.currentUser.uid,FV=firebase.firestore.FieldValue;
+    db.collection("posts").doc(p.id).update({likedBy:liked?FV.arrayRemove(uid):FV.arrayUnion(uid)}).catch(function(er){toast(er&&er.code==="permission-denied"?"Sin permiso: faltan las reglas nuevas de Firestore":"No se pudo dar like")});
+  }else{var i=p.likes.indexOf(me);if(i>-1)p.likes.splice(i,1);else p.likes.push(me);renderComm()}
+}
+function delPost(p){
+  if(!confirm("¿Borrar esta publicación?"))return;
+  if(CLOUD)db.collection("posts").doc(p.id)["delete"]().catch(function(){toast("No se pudo borrar la publicación")});
+  else{LP=LP.filter(function(x){return x.id!==p.id});renderComm()}
+}
+function commentRow(c,mine,onDel){
+  var row=el("div","cm"),av=el("div","av",initial(c.c));av.style.setProperty("--h",hue(c.c));fillAv(av,c.c);
+  var b=el("div");b.style.minWidth="0";b.style.flex="1";
+  var who=el("div","who",c.c);who.appendChild(el("span","when",agoMs(c.ts)));
+  b.appendChild(who);b.appendChild(el("div","txt",c.t));row.appendChild(av);row.appendChild(b);
+  if(mine){var d=el("button","del","Borrar");d.type="button";d.onclick=onDel;row.appendChild(d)}
+  return row;
+}
+function cbox(p){
+  var w=el("div","pcm"),f=el("form","cform"),i=el("input");i.type="text";i.maxLength=500;i.placeholder="Añade un comentario…";
+  i.value=cdraft[p.id]||"";i.addEventListener("input",function(){cdraft[p.id]=i.value});
+  var b=el("button","btn primary","Comentar");b.type="submit";f.appendChild(i);f.appendChild(b);
+  var hint=el("p","hint"),list=el("div");w.appendChild(f);w.appendChild(hint);w.appendChild(list);
+  var items=[];
+  function draw(){
+    list.innerHTML="";hint.textContent=me?"":"Inicia sesión para comentar.";
+    items.forEach(function(c){
+      var mine=CLOUD?!!(auth&&auth.currentUser&&auth.currentUser.uid===c.uid):!!(me&&c.c===me);
+      list.appendChild(commentRow(c,mine,function(){
+        if(CLOUD)db.collection("posts").doc(p.id).collection("comments").doc(c.id)["delete"]().catch(function(){toast("No se pudo borrar el comentario")});
+        else{LPC[p.id]=(LPC[p.id]||[]).filter(function(x){return x.id!==c.id});items=LPC[p.id].slice();draw()}
+      }));
+    });
+  }
+  if(CLOUD&&db){
+    bunsubs.push(db.collection("posts").doc(p.id).collection("comments").orderBy("ts","desc").limit(100).onSnapshot(function(sn){
+      items=[];sn.forEach(function(d){var o=d.data();items.push({id:d.id,uid:o.uid,c:o.channel,t:o.text,ts:o.ts})});draw();
+    },function(){}));
+  }else{items=(LPC[p.id]||[]).slice()}
+  f.addEventListener("submit",function(e){
+    e.preventDefault();var txt=i.value.trim();if(!txt)return;
+    if(!me){toast("Inicia sesión para comentar");openAuth("in");return}
+    b.disabled=true;var job;
+    if(CLOUD)job=db.collection("posts").doc(p.id).collection("comments").add({uid:auth.currentUser.uid,channel:me,text:txt,ts:Date.now()});
+    else{(LPC[p.id]=LPC[p.id]||[]).unshift({id:"l"+Date.now(),c:me,t:txt,ts:Date.now()});items=LPC[p.id].slice();draw();job=Promise.resolve()}
+    job.then(function(){i.value="";cdraft[p.id]=""},function(er){toast(er&&er.code==="permission-denied"?"Sin permiso: faltan las reglas nuevas de Firestore":"No se pudo publicar el comentario")}).then(function(){b.disabled=false});
+  });
+  draw();
+  return w;
+}
+function setPimg(d){pimg=d||"";$("#pprev").hidden=!d;if(d)$("#pimgel").src=d;else $("#pimgel").removeAttribute("src")}
+$("#pfile").addEventListener("change",function(){
+  var f=this.files[0];this.value="";if(!f)return;
+  readImage(f,720).then(function(d){setPimg(d);$("#perr").textContent=""},function(er){$("#perr").textContent=er.message});
+});
+$("#pimgx").onclick=function(){setPimg("")};
+$("#pform").addEventListener("submit",function(e){
+  e.preventDefault();
+  var txt=$("#ptext").value.trim();
+  if(!txt&&!pimg){$("#perr").textContent="Escribe algo o añade una imagen.";return}
+  if(!me){toast("Inicia sesión para publicar");openAuth("in");return}
+  $("#perr").textContent="";var btn=$("#psend");btn.disabled=true;var job;
+  if(CLOUD)job=db.collection("posts").add({uid:auth.currentUser.uid,channel:me,text:txt,img:pimg,ts:Date.now(),likedBy:[]});
+  else{LP.unshift({id:"l"+Date.now(),uid:"",c:me,t:txt,img:pimg,ts:Date.now(),likes:[]});job=Promise.resolve()}
+  job.then(function(){$("#ptext").value="";setPimg("");renderComm();toast("Publicado")},
+    function(er){toast(er&&er.code==="permission-denied"?"Sin permiso: faltan las reglas nuevas de Firestore":"No se pudo publicar")}).then(function(){btn.disabled=false});
+});
+
 /* ---- operaciones (modo local o compartido) ---- */
 function doRegister(name,pass,avatar){
   var k=ukey(name);
@@ -582,6 +831,7 @@ function refreshAcct(){
   if(me){b.className="acct";var d=el("span","dot",initial(me));var src=avSrc(me);if(src){d.textContent="";var im=el("img");im.src=src;im.alt="";d.appendChild(im)}b.appendChild(d);b.appendChild(el("span","nm",me))}
   else{b.className="acct out";b.textContent="Iniciar sesión"}
   if(cur&&$("#watch").open)renderComments();
+  if(tab==="comm")renderComm();
 }
 function setMode(m){
   mode=m;var up=m==="up";
@@ -616,7 +866,7 @@ $("#accfile").addEventListener("change",function(){
 $("#accclose").onclick=function(){$("#accDlg").close()};
 $("#accDlg").addEventListener("click",function(e){if(e.target===this)this.close()});
 $("#logout").onclick=function(){doLogout().then(function(){refreshAcct();render();$("#accDlg").close();toast("Sesión cerrada")})};
-$("#mychan").onclick=function(){$("#accDlg").close();chan=me;term="";$("#q").value="";render();window.scrollTo(0,0)};
+$("#mychan").onclick=function(){$("#accDlg").close();chan=me;term="";$("#q").value="";setTab("home");render();window.scrollTo(0,0)};
 $("#authForm").addEventListener("submit",function(e){
   e.preventDefault();
   var name=$("#a-user").value.replace(/\s+/g," ").trim(),pass=$("#a-pass").value,k=ukey(name),up=mode==="up";
