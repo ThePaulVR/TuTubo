@@ -119,6 +119,20 @@ dialog::backdrop{background:rgba(5,8,20,.65)}
 .btn.primary{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:10px;font:600 14px var(--f-body);transition:.2s;pointer-events:none;z-index:50;max-width:calc(100% - 32px)}
 .toast.on{opacity:1;transform:translate(-50%,0)}
+.cmts{margin-top:20px;border-top:1px solid var(--line);padding-top:16px}
+.cmts h3{margin:0 0 12px;font:700 16px var(--f-display)}
+.cform{display:flex;gap:8px}
+.cform input{flex:1;min-width:0;height:40px;border:1px solid var(--line);border-radius:99px;background:var(--bg);color:var(--fg);padding:0 16px;font:500 15px var(--f-body)}
+.cform input:focus{outline:0;border-color:var(--accent)}
+.cform .btn{border-radius:99px;height:40px}
+.cmts .hint{font-size:13px;color:var(--muted);margin:8px 0 0;min-height:1em}
+.cm{display:flex;gap:10px;margin-top:14px;align-items:flex-start}
+.cm .av{width:32px;height:32px;font-size:13px}
+.cm .who{font:700 13px var(--f-body)}
+.cm .when{color:var(--muted);font-weight:500;margin-left:8px;font-size:12px}
+.cm .txt{overflow-wrap:anywhere;white-space:pre-wrap;font-size:15px}
+.cm .del{border:0;background:none;color:var(--muted);font:600 12px var(--f-body);padding:2px 6px;flex:none}
+.cm .del:hover{color:var(--fg)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
@@ -140,7 +154,10 @@ dialog::backdrop{background:rgba(5,8,20,.65)}
   <main class="grid" id="grid" aria-live="polite"></main>
 </div>
 
-<dialog id="watch" aria-label="Reproductor"><button class="close" id="wclose" aria-label="Cerrar">×</button><div class="watch"><div class="stage"><div class="player" id="player"></div><h2 id="wtitle"></h2><div class="row"><div class="av" id="wav"></div><div class="meta"><div class="title" id="wch"></div><div class="sub" id="wsub"></div></div></div></div><aside class="side"><h3>Siguientes</h3><div id="next"></div></aside></div></dialog>
+<dialog id="watch" aria-label="Reproductor"><button class="close" id="wclose" aria-label="Cerrar">×</button><div class="watch"><div class="stage"><div class="player" id="player"></div><h2 id="wtitle"></h2><div class="row"><div class="av" id="wav"></div><div class="meta"><div class="title" id="wch"></div><div class="sub" id="wsub"></div></div></div>
+<section class="cmts" id="cmts"><h3 id="ctitle">Comentarios</h3>
+<form class="cform" id="cform" autocomplete="off"><input type="text" id="ctext" maxlength="500" placeholder="Añade un comentario…" aria-label="Escribe un comentario"><button class="btn primary" type="submit" id="csend">Comentar</button></form>
+<p class="hint" id="chint"></p><div id="clist"></div></section></div><aside class="side"><h3>Siguientes</h3><div id="next"></div></aside></div></dialog>
 
 <dialog id="uploadDlg" aria-label="Subir video"><form class="form" id="form" method="dialog">
   <h2>Subir video</h2>
@@ -267,10 +284,11 @@ function open(v){
     var b=el("button","next");b.appendChild(thumb(x,true));
     var m=el("div","meta");m.appendChild(el("div","title",x.t));m.appendChild(el("div","sub",x.c+" · "+views(x.v)));b.appendChild(m);
     b.onclick=function(){open(x)};n.appendChild(b)});
+  loadComments(v);
   var d=$("#watch");if(!d.open)d.showModal();
   render();
 }
-function stop(){var p=$("#player").querySelector("video");if(p)p.pause()}
+function stop(){var p=$("#player").querySelector("video");if(p)p.pause();if(cunsub){cunsub();cunsub=null}}
 $("#wclose").onclick=function(){stop();$("#watch").close()};
 $("#watch").addEventListener("click",function(e){if(e.target===this){stop();this.close()}});
 $("#watch").addEventListener("close",stop);
@@ -463,6 +481,53 @@ function loadVideo(v){
   return v.loading;
 }
 
+
+/* ---- comentarios ---- */
+var LC={},cunsub=null,CL=[];
+function ckey(v){return v.fid||"s"+v.id}
+function agoMs(ts){var m=Math.floor((Date.now()-ts)/6e4);if(m<1)return "hace un momento";if(m<60)return "hace "+m+" min";var h=Math.floor(m/60);if(h<24)return "hace "+h+(h===1?" hora":" horas");return ago(Math.floor(h/24))}
+function renderComments(){
+  var v=cur;if(!v)return;
+  var l=$("#clist");l.innerHTML="";
+  $("#ctitle").textContent=CL.length+(CL.length===1?" comentario":" comentarios");
+  $("#chint").textContent=me?"":"Inicia sesión para comentar.";
+  CL.forEach(function(c){
+    var row=el("div","cm"),av=el("div","av",initial(c.c));av.style.setProperty("--h",hue(c.c));fillAv(av,c.c);
+    var b=el("div");b.style.minWidth="0";b.style.flex="1";
+    var who=el("div","who",c.c);who.appendChild(el("span","when",agoMs(c.ts)));
+    b.appendChild(who);b.appendChild(el("div","txt",c.t));
+    row.appendChild(av);row.appendChild(b);
+    var mine=CLOUD?!!(auth&&auth.currentUser&&auth.currentUser.uid===c.uid):!!(me&&c.c===me);
+    if(mine){var d=el("button","del","Borrar");d.type="button";d.onclick=function(){delComment(v,c)};row.appendChild(d)}
+    l.appendChild(row);
+  });
+}
+function loadComments(v){
+  if(cunsub){cunsub();cunsub=null}
+  CL=[];renderComments();
+  if(CLOUD){
+    if(!db)return;
+    cunsub=db.collection("videos").doc(ckey(v)).collection("comments").orderBy("ts","desc").limit(100).onSnapshot(function(sn){
+      if(cur!==v)return;
+      CL=[];sn.forEach(function(d){var o=d.data();CL.push({id:d.id,uid:o.uid,c:o.channel,t:o.text,ts:o.ts})});
+      renderComments();
+    },function(){});
+  }else{CL=(LC[ckey(v)]||[]).slice();renderComments()}
+}
+function delComment(v,c){
+  if(CLOUD){db.collection("videos").doc(ckey(v)).collection("comments").doc(c.id)["delete"]().catch(function(){toast("No se pudo borrar el comentario")})}
+  else{LC[ckey(v)]=(LC[ckey(v)]||[]).filter(function(x){return x.id!==c.id});CL=LC[ckey(v)].slice();renderComments()}
+}
+$("#cform").addEventListener("submit",function(e){
+  e.preventDefault();
+  var v=cur,txt=$("#ctext").value.trim();if(!v||!txt)return;
+  if(!me){toast("Inicia sesión para comentar");openAuth("in");return}
+  var btn=$("#csend"),job;btn.disabled=true;
+  if(CLOUD)job=db.collection("videos").doc(ckey(v)).collection("comments").add({uid:auth.currentUser.uid,channel:me,text:txt,ts:Date.now()});
+  else{var o={id:"l"+Date.now(),c:me,t:txt,ts:Date.now()};(LC[ckey(v)]=LC[ckey(v)]||[]).unshift(o);CL=LC[ckey(v)].slice();renderComments();job=Promise.resolve()}
+  job.then(function(){$("#ctext").value=""},function(er){toast(er&&er.code==="permission-denied"?"Sin permiso: faltan las reglas nuevas de Firestore":"No se pudo publicar el comentario")}).then(function(){btn.disabled=false});
+});
+
 /* ---- operaciones (modo local o compartido) ---- */
 function doRegister(name,pass,avatar){
   var k=ukey(name);
@@ -516,6 +581,7 @@ function refreshAcct(){
   var b=$("#acct");b.textContent="";
   if(me){b.className="acct";var d=el("span","dot",initial(me));var src=avSrc(me);if(src){d.textContent="";var im=el("img");im.src=src;im.alt="";d.appendChild(im)}b.appendChild(d);b.appendChild(el("span","nm",me))}
   else{b.className="acct out";b.textContent="Iniciar sesión"}
+  if(cur&&$("#watch").open)renderComments();
 }
 function setMode(m){
   mode=m;var up=m==="up";
