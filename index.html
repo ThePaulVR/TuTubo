@@ -86,19 +86,34 @@ header.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;backgroun
 
 dialog{border:0;padding:0;background:var(--surface);color:var(--fg);border-radius:16px;box-shadow:var(--shadow);width:min(960px,calc(100% - 24px));max-height:calc(100% - 24px)}
 dialog::backdrop{background:rgba(5,8,20,.65)}
-.watch{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:0}
-.stage{padding:16px;min-width:0}
-.player{aspect-ratio:16/9;border-radius:12px;background:#05070f;overflow:hidden;display:grid;place-items:center;color:#c9d0f0;text-align:center;padding:16px}
-.player video{width:100%;height:100%;display:block}
-.player p{margin:0;max-width:34ch;font-size:14px}
-.stage h2{font:800 20px/1.25 var(--f-display);margin:14px 0 6px;overflow-wrap:anywhere}
-.side{border-left:1px solid var(--line);padding:16px;overflow:auto;max-height:70vh;min-width:0}
-.side h3{margin:0 0 10px;font:700 12px var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.next{display:flex;gap:10px;width:100%;background:none;border:0;padding:6px 0;text-align:left;min-width:0}
-.next .thumb{width:100px;flex:none;border-radius:8px}
-.next .thumb .big{font-size:22px}
 .close{position:absolute;right:10px;top:10px;width:34px;height:34px;border-radius:50%;border:0;background:var(--surface-2);font-size:18px;line-height:1;z-index:2}
-@media (max-width:760px){.watch{grid-template-columns:1fr}.side{border-left:0;border-top:1px solid var(--line);max-height:none}}
+/* Página de reproducción (como YouTube): reproductor grande a la izquierda, siguientes a la derecha */
+body.watching .wrap,body.watching .bar-in{max-width:1760px}
+body.watching{padding-bottom:32px}
+dialog#watch{position:static;inset:auto;width:100%;max-width:1760px;height:auto;max-height:none;margin:0 auto;padding:0;border:0;border-radius:0;
+  background:transparent;box-shadow:none;color:inherit;overflow:visible}
+#wclose{display:none}
+.logo{cursor:pointer}
+.watch{display:grid;grid-template-columns:minmax(0,1fr) clamp(300px,23vw,420px);gap:24px;margin-top:16px;align-items:start}
+.stage{min-width:0}
+.player{width:100%;aspect-ratio:16/9;max-height:calc(100vh - 150px);max-height:calc(100dvh - 150px);min-height:220px;border-radius:14px;background:#000;overflow:hidden;
+  display:grid;place-items:center;color:#c9d0f0;text-align:center;padding:16px}
+.player video{width:100%;height:100%;display:block;object-fit:contain;background:#000}
+.player p{margin:0;max-width:34ch;font-size:14px}
+.stage h2{font:800 22px/1.3 var(--f-display);margin:14px 0 10px;overflow-wrap:anywhere}
+.wrow{cursor:pointer;display:flex;align-items:center;gap:12px;min-width:0}
+.wrow .av{width:44px;height:44px;font-size:18px}
+.wrow .title{font:700 16px/1.3 var(--f-body)}
+.desc{margin-top:14px;background:var(--surface-2);border-radius:14px;padding:12px 16px;font:500 14px/1.45 var(--f-body)}
+.desc b{font-weight:700}
+.side{padding:0;min-width:0}
+.side h3{margin:0 0 10px;font:700 12px var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.next{display:flex;gap:10px;width:100%;background:none;border:0;padding:0;margin-bottom:12px;text-align:left;min-width:0;align-items:flex-start}
+.next .thumb{width:min(168px,42%);flex:none;border-radius:10px}
+.next .thumb .big{font-size:26px}
+.next .title{font:600 14px/1.3 var(--f-body);-webkit-line-clamp:3}
+.next .sub{font-size:12.5px}
+@media (max-width:1000px){.watch{grid-template-columns:1fr;gap:16px}.player{max-height:none}.next .thumb{width:min(168px,44%)}}
 
 .form{padding:22px;display:grid;gap:14px;min-width:0}
 .form h2{margin:0;font:800 20px var(--f-display)}
@@ -208,7 +223,7 @@ label.btn{display:inline-flex;align-items:center;cursor:pointer}
   </section>
 </div>
 
-<dialog id="watch" aria-label="Reproductor"><button class="close" id="wclose" aria-label="Cerrar">×</button><div class="watch"><div class="stage"><div class="player" id="player"></div><h2 id="wtitle"></h2><div class="row"><div class="av" id="wav"></div><div class="meta"><div class="title" id="wch"></div><div class="sub" id="wsub"></div></div></div>
+<dialog id="watch" aria-label="Reproductor"><button class="close" id="wclose" aria-label="Cerrar">×</button><div class="watch"><div class="stage"><div class="player" id="player"></div><h2 id="wtitle"></h2><div class="wrow"><div class="av" id="wav"></div><div class="meta"><div class="title" id="wch"></div></div></div><div class="desc"><b id="wsub"></b></div>
 <section class="cmts" id="cmts"><h3 id="ctitle">Comentarios</h3>
 <form class="cform" id="cform" autocomplete="off"><input type="text" id="ctext" maxlength="500" placeholder="Añade un comentario…" aria-label="Escribe un comentario"><button class="btn primary" type="submit" id="csend">Comentar</button></form>
 <p class="hint" id="chint"></p><div id="clist"></div></section></div><aside class="side"><h3>Siguientes</h3><div id="next"></div></aside></div></dialog>
@@ -333,22 +348,42 @@ function open(v){
     var note=el("p",null,"Video no disponible en esta versión. Aquí se reproducen los videos que subas desde tu navegador.");
     if(v.img){note.style.cssText="position:absolute;left:0;right:0;bottom:0;max-width:none;padding:10px 14px;background:rgba(5,7,15,.78);font-size:13px"}
     pl.appendChild(note)}
-  $("#wtitle").textContent=v.t;$("#wch").textContent=v.c;
+  $("#wtitle").textContent=v.t;$("#wch").textContent=v.c;document.title=v.t+" – TuTubo";
   var av=$("#wav");av.textContent=initial(v.c);av.style.background="";av.style.setProperty("--h",hue(v.c));fillAv(av,v.c);
   $("#wsub").textContent=views(v.v)+" · "+ago(v.d);
   var n=$("#next");n.innerHTML="";
-  VIDEOS.filter(function(x){return x!==v&&!x.short}).sort(function(x,y){return y.v-x.v}).slice(0,6).forEach(function(x){
+  VIDEOS.filter(function(x){return x!==v&&!x.short}).sort(function(x,y){return y.v-x.v}).slice(0,16).forEach(function(x){
     var b=el("button","next");b.appendChild(thumb(x,true));
     var m=el("div","meta");m.appendChild(el("div","title",x.t));m.appendChild(el("div","sub",x.c+" · "+views(x.v)));b.appendChild(m);
     b.onclick=function(){open(x)};n.appendChild(b)});
   loadComments(v);
-  var d=$("#watch");if(!d.open)d.showModal();
+  var d=$("#watch");if(!d.open)d.show();
+  enterWatch();
   render();
 }
 function stop(){var p=$("#player").querySelector("video");if(p)p.pause();if(cunsub){cunsub();cunsub=null}}
-$("#wclose").onclick=function(){stop();$("#watch").close()};
-$("#watch").addEventListener("click",function(e){if(e.target===this){stop();this.close()}});
-$("#watch").addEventListener("close",stop);
+function enterWatch(){
+  document.body.classList.add("watching");
+  ["#tabs","#controls","#grid","#shortsView","#commView"].forEach(function(s){$(s).hidden=true});
+  window.scrollTo(0,0);
+}
+function leaveWatch(){
+  var d=$("#watch");stop();if(d.open)d.close();
+  document.body.classList.remove("watching");document.title="TuTubo";
+  $("#tabs").hidden=false;$("#controls").hidden=$("#grid").hidden=tab!=="home";
+  $("#shortsView").hidden=tab!=="shorts";$("#commView").hidden=tab!=="comm";
+  if(tab==="shorts")renderShorts(true);
+}
+$("#wclose").onclick=leaveWatch;
+$("#watch").addEventListener("close",function(){if(!this.open&&document.body.classList.contains("watching"))leaveWatch()});
+document.addEventListener("keydown",function(e){
+  if(e.key==="Escape"&&$("#watch").open&&!document.querySelector("dialog[open]:not(#watch)"))leaveWatch();
+});
+document.querySelector(".wrow").onclick=function(){if(cur){var c=cur.c;leaveWatch();chan=c;term="";$("#q").value="";setTab("home");render()}};
+document.querySelector(".logo").onclick=function(){
+  if($("#watch").open)leaveWatch();
+  chan="";term="";$("#q").value="";setTab("home");render();
+};
 
 $("#up").onclick=function(){
   if(!me){toast("Inicia sesión para subir videos");openAuth("in");return}
@@ -378,7 +413,7 @@ $("#form").addEventListener("submit",function(e){
   });
 });
 $("#uploadDlg").addEventListener("click",function(e){if(e.target===this)this.close()});
-$("#q").addEventListener("input",function(e){term=e.target.value;if(tab!=="home")setTab("home");render()});
+$("#q").addEventListener("input",function(e){term=e.target.value;if($("#watch").open)leaveWatch();if(tab!=="home")setTab("home");render()});
 $("#theme").onclick=function(){var r=document.documentElement,dark=r.dataset.theme?r.dataset.theme==="dark":matchMedia("(prefers-color-scheme:dark)").matches;r.dataset.theme=dark?"light":"dark"};
 
 /* ===== Cuentas =====
@@ -610,6 +645,7 @@ function readImage(file,max){
   });
 }
 function setTab(t){
+  if($("#watch").open)leaveWatch();
   var prev=tab;tab=t;
   document.querySelectorAll("#tabs button").forEach(function(b){b.setAttribute("aria-selected",String(b.dataset.t===t))});
   $("#controls").hidden=$("#grid").hidden=t!=="home";
