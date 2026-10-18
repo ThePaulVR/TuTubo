@@ -262,7 +262,7 @@ var VIDEOS=[
  {c:"salvuuu.",t:"ah ahhhh",d:365,v:22,url:"videos/v11.mp4"},
  {c:"Ortovich",t:"Los memes de chocoflakes de ahora 😂😂😂😂",d:365,v:5,url:"videos/v12.mp4"},
  {c:"Un Camión",t:"Todo Cambió #3",d:365,v:4,url:"videos/v13.mp4"},
- {c:"Tommy Verga",t:"No abras este video",d:1,v:14,url:"videos/v14.mp4",poster:"videos/v14.jpg"},
+ {c:"Tommy Verga",t:"No abras este video",d:1,v:14,url:"videos/v14.mp4",nothumb:1},
  {c:"MassimoVR65",t:"Mi HP es mejor a la vuestra, un vídeo para probarlo !1!!!11!",d:90,v:16,url:"videos/v15.mp4",poster:"videos/v15.jpg"},
  {c:"bich",t:"kid niger",d:365,v:13,url:"videos/v16.mp4"},
  {c:"sasasaS",t:"sasa",d:365,v:9,url:"videos/v17.mp4",poster:"videos/v17.jpg"},
@@ -285,10 +285,10 @@ function fillAv(n,name){var src=avSrc(name);if(!src)return;n.textContent="";n.st
 function initial(s){var m=s.match(/[A-Za-zÀ-ÿ0-9]/);return m?m[0].toUpperCase():"?"}
 
 function thumb(v,small){
-  var usev=v.url&&(!v.img||v.poster);
+  var usev=v.url&&!v.nothumb&&(!v.img||v.poster);
   var t=el("div","thumb"+(usev?" local":""));t.style.setProperty("--h",hue(v.t));
   if(usev){var vid=el("video");vid.src=v.url;vid.muted=true;vid.preload="metadata";if(v.poster)vid.poster=v.poster;t.appendChild(vid)}
-  else if(v.img){var im=el("img");im.src=v.img;im.alt="";t.appendChild(im)}
+  else if(v.img&&!v.nothumb){var im=el("img");im.src=v.img;im.alt="";t.appendChild(im)}
   else t.appendChild(el("span","big",initial(v.t)));
   if(!small){var p=el("span","play");p.innerHTML='<svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>';t.appendChild(p)}
   if(v.d<=1&&!small)t.appendChild(el("span","new","Nuevo"));
