@@ -26,17 +26,17 @@
 body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:16px;line-height:1.45;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--surface)}
-.wrap{max-width:1200px;margin:0 auto}
+.wrap{max-width:1760px;margin:0;padding-left:76px}
 button{font:inherit;color:inherit;cursor:pointer}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 header.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--surface);
   margin-inline:calc(-1 * max(16px,env(safe-area-inset-left,0px))) calc(-1 * max(16px,env(safe-area-inset-right,0px)));
   padding:10px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));border-bottom:1px solid var(--line)}
-.bar-in{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.logo{display:flex;align-items:center;gap:8px;font:800 22px var(--f-display);letter-spacing:-.02em;margin-right:auto}
+.bar-in{max-width:none;margin:0;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:8px;font:800 22px var(--f-display);letter-spacing:-.02em}
 .logo img{width:34px;height:34px;border-radius:8px;display:block}
-.search{flex:1 1 280px;max-width:560px;display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--line);border-radius:99px;padding:0 16px;height:42px;order:2}
+.search{flex:1 1 280px;max-width:560px;margin-inline:auto;display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--line);border-radius:99px;padding:0 16px;height:42px;order:2}
 .search:focus-within{border-color:var(--accent)}
 .search input{flex:1;min-width:0;border:0;background:transparent;color:var(--fg);font:500 16px var(--f-body);outline:0;height:100%}
 .search input::placeholder{color:var(--muted)}
@@ -88,7 +88,7 @@ dialog{border:0;padding:0;background:var(--surface);color:var(--fg);border-radiu
 dialog::backdrop{background:rgba(5,8,20,.65)}
 .close{position:absolute;right:10px;top:10px;width:34px;height:34px;border-radius:50%;border:0;background:var(--surface-2);font-size:18px;line-height:1;z-index:2}
 /* Página de reproducción (como YouTube): reproductor grande a la izquierda, siguientes a la derecha */
-body.watching .wrap,body.watching .bar-in{max-width:1760px}
+body.watching .wrap{padding-left:0}
 body.watching{padding-bottom:32px}
 dialog#watch{position:static;inset:auto;width:100%;max-width:1760px;height:auto;max-height:none;margin:0 auto;padding:0;border:0;border-radius:0;
   background:transparent;box-shadow:none;color:inherit;overflow:visible}
@@ -101,6 +101,13 @@ dialog#watch{position:static;inset:auto;width:100%;max-width:1760px;height:auto;
 .player video{width:100%;height:100%;display:block;object-fit:contain;background:#000}
 .player p{margin:0;max-width:34ch;font-size:14px}
 .stage h2{font:800 22px/1.3 var(--f-display);margin:14px 0 10px;overflow-wrap:anywhere}
+.wbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.wbar .wrow{flex:1 1 220px}
+.vlike{display:flex;align-items:center;gap:8px;border:0;background:var(--surface-2);color:var(--fg);border-radius:99px;height:40px;padding:0 18px;font:700 14px var(--f-body)}
+.vlike:hover{filter:brightness(1.08)}
+.vlike svg{fill:none}
+.vlike.on{background:var(--accent);color:var(--accent-fg)}
+.vlike.on svg{fill:currentColor}
 .wrow{cursor:pointer;display:flex;align-items:center;gap:12px;min-width:0}
 .wrow .av{width:44px;height:44px;font-size:18px}
 .wrow .title{font:700 16px/1.3 var(--f-body)}
@@ -189,9 +196,18 @@ label.btn{display:inline-flex;align-items:center;cursor:pointer}
 .pact button.on2{background:var(--surface-2);color:var(--fg)}
 .pcm{margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
 /* canal: cabecera y comunidad */
-.chead{margin-top:20px}
-.chtop{display:flex;gap:20px;align-items:center}
-.chtop .bigav{margin:0;width:88px;height:88px;font-size:34px;flex:none}
+.chead{margin-top:12px}
+.chtop{display:flex;gap:20px;align-items:center;margin-top:16px}
+.chtop .bigav{margin:0;width:clamp(72px,10vw,128px);height:clamp(72px,10vw,128px);font-size:clamp(28px,4vw,48px);flex:none}
+.banner{width:100%;height:clamp(90px,14vw,200px);border-radius:16px;background:center/cover no-repeat}
+.banner.def{background-image:linear-gradient(120deg,hsl(var(--h) 55% 36%),hsl(calc(var(--h) + 55) 55% 28%))}
+.chbtns{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.chdesc{margin:8px 0 0;font-size:14px;color:var(--muted);max-width:70ch;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer;overflow-wrap:anywhere;white-space:pre-wrap}
+.chdesc.open{-webkit-line-clamp:unset;display:block}
+.chsearch{margin-top:14px}
+.chsearch input{width:100%;max-width:520px;height:42px;border:1px solid var(--line);border-radius:99px;background:var(--surface);color:var(--fg);padding:0 16px;font:500 16px var(--f-body)}
+.chsearch input:focus{outline:0;border-color:var(--accent)}
+.nav button.ico{padding:10px 14px;display:grid;place-items:center}
 .chinfo{min-width:0}
 .chinfo h1{margin:0;font:800 clamp(24px,4vw,34px)/1.15 var(--f-display);overflow-wrap:anywhere}
 .chinfo p{margin:4px 0 0;color:var(--muted);font-size:14px}
@@ -209,11 +225,57 @@ label.btn{display:inline-flex;align-items:center;cursor:pointer}
 .rform{margin-top:6px}
 .rform .btn{height:36px;padding:0 14px}
 .cm.rp .av{width:26px;height:26px;font-size:11px}
+/* barra lateral (en el celular, barra inferior) */
+.rail{position:fixed;left:0;top:calc(env(safe-area-inset-top,0px) + 63px);bottom:0;width:76px;display:flex;flex-direction:column;gap:2px;padding:8px 2px;background:var(--bg);z-index:15;overflow:auto}
+.rail button{display:flex;flex-direction:column;align-items:center;gap:5px;border:0;background:none;color:var(--fg);padding:12px 0 10px;border-radius:12px;font:600 10px/1.1 var(--f-body);letter-spacing:-.01em}
+.rail button:hover{background:var(--surface-2)}
+.rail button[aria-selected="true"]{background:var(--surface-2)}
+.rail svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+@media (max-width:899px){
+  .wrap{padding-left:0;padding-bottom:76px}
+  .rail{top:auto;bottom:0;left:0;right:0;width:auto;height:calc(58px + env(safe-area-inset-bottom,0px));flex-direction:row;justify-content:space-around;padding:4px 4px calc(4px + env(safe-area-inset-bottom,0px));background:var(--surface);border-top:1px solid var(--line);overflow:hidden}
+  .rail button{flex:1;padding:6px 0;font-size:10px}
+  .rail svg{width:22px;height:22px}
+}
+/* playlists */
+.grid.shorts{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.grid.shorts .thumb{aspect-ratio:9/16}
+.thumb .plbadge{position:absolute;right:6px;bottom:6px;background:rgba(0,0,0,.78);color:#fff;font:700 12px var(--f-body);padding:2px 8px;border-radius:6px}
+.sech{display:flex;align-items:center;gap:12px;margin:26px 0 12px;flex-wrap:wrap}
+.sech h2{margin:0;font:800 20px var(--f-display);margin-right:auto}
+.plhead{display:flex;gap:10px 16px;flex-wrap:wrap;align-items:center;margin:20px 0 14px}
+.plhead h1{margin:0;font:800 clamp(22px,3.5vw,30px)/1.2 var(--f-display);overflow-wrap:anywhere;flex:1 1 100%}
+.plhead p{margin:0;color:var(--muted);font-size:14px;margin-right:auto}
+.plhead .nm{background:none;border:0;padding:0;color:var(--fg);font:700 14px var(--f-body)}
+.plhead .nm:hover{text-decoration:underline}
+.plrow{display:flex;gap:12px;align-items:center;padding:8px;border-radius:12px;cursor:pointer;max-width:900px}
+.plrow:hover{background:var(--surface-2)}
+.plrow .thumb{width:min(168px,34%);flex:none;border-radius:10px}
+.plrow .pln{width:22px;text-align:center;color:var(--muted);font-size:13px;flex:none}
+.plrow .meta{flex:1}
+.plrow .del{border:0;background:none;color:var(--muted);font:600 12px var(--f-body);padding:4px 8px;flex:none}
+.plrow .del:hover{color:var(--fg)}
+.chipsrow{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}
+.chipsrow .chip{display:flex;align-items:center;gap:8px;padding:4px 14px 4px 4px}
+.chipsrow .chip .av{width:26px;height:26px;font-size:11px}
+.plpanel{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:18px;background:var(--surface)}
+.plpanel h3{margin:0 0 2px}
+.plpanel .cnt{font-size:12px;color:var(--muted);margin-bottom:8px}
+.plpanel .lst{max-height:320px;overflow:auto}
+.plpanel .next{padding:4px;border-radius:8px;margin-bottom:4px}
+.plpanel .next.curv{background:var(--surface-2)}
+.plpanel .next .thumb{width:90px}
+.vsave svg{fill:none}
+.form label.chk{display:flex;align-items:center;gap:10px;padding:6px 2px;font:600 15px var(--f-body);color:var(--fg)}
+.form label.chk small{margin-left:auto;color:var(--muted);font-weight:500}
+.form label.chk input{width:18px;height:18px;accent-color:var(--accent)}
+.savelist{max-height:240px;overflow:auto}
+.bprev{height:84px;border-radius:10px;background:var(--surface-2) center/cover no-repeat;display:grid;place-items:center;color:var(--muted);font-size:13px}
+.form textarea{border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--fg);padding:10px 12px;font:500 15px var(--f-body);resize:vertical;min-height:70px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
-<div class="wrap">
-  <header class="bar">
+<header class="bar">
     <div class="bar-in">
       <div class="logo"><img src="data:image/webp;base64,UklGRhoFAABXRUJQVlA4IA4FAABQHwCdASpgAF4APiUOhkIhhzafbQYAkSyNbkpq06j7fQ/jt5AevjtX4E5vs6/XT+++27eNfol7snmA/YD1jPwz7AD+l/5XrY/Qv/VX04vZl/bL9wPZaujNeh/k8zR8oDdefQ3nS9gAOrLQgyNjKrQ3kL6CNLD9lX7lMHcZIUPn6VnGSd8lv+4beU4L6V+1hz6n4HzS6YIG8Y88qfR/ez+SdlXWSRl4fqWVdvN7M+ojuDUez+uPTuRZbjx9ouTYd0Pwu9xj+ZwW7u8Uvo0vw0j0ALICegL8a1E1FAKd3IY7eMH22aZVITjDo1PsIEEdoAVeWPhi2rGpdGGVFvTDQ0b+gGNYAP7//icz9z/UFp82l35w33qj5ocVXn9OZC8Mqejw9zN/0cGkf5vnGSneLlf6qbEtrQjhq3kOl2H3x//qNB9dZ8fjEb1Y1/H+P/hr9iZfZv+Qx8I6v7PWv6nr/X6gp8hYqNV6HwgkwhLPWH8CZqCbIQ5bu1GgE0D9KjNlTdwJu2t9pZ8OeuPdmAedQ/PzoElS/SRirqoopSWTtxHFy3zQTZK1kD/3jXqPvlbCIwKrBOxU7kMLhunrBqxLqMJ8wQS2rP9MtAdZ0BixjnDCpNOSaS0iHJK5Cf1WQVcEHZYRHF3mf7NFf2rNOYy3BCtl5gR1nuUd2wn/L0//tXbmTmu9+LFHYfIoAi6SDn3guhZPr6/ckXP6bb2tf6Y+OP0k/l2VXe/CIT9v36qP09qeTzL/LubJxIr/GllyILsCxf/68Arfi5hjetcIgzDzaeZbvA7Zkey/OQqFUtrpcFmw6l/DaUBSszsyNnmuyIhjF4PZ0xSostdLy198XvjRty8nBAUm/F4N6OjxY5JQYu4+YniMETwhe5u7m/9JYHIRXMsZdt0JxEhlOP18GsDw8Nm93LOj9w0AnBihPenFq9jNJzHu8ual2B/HfYDsvlVRYwkr46LS7oFSKukL1nUgaIPtaDktJ0fa7zCGhrMoSyJ/e5wNLu9tg/wYSRD2qDE+DolNkBe+1BvmUFcV5/Ebb3N48F3bu4Rd8vt79GjkylYEsXlpEC+5L5+OUAuZEIF+sxLjtboN843fUDG7ySpX3darEEBBPBFOpogzNOeDfjqZAxY3LcmClKG648a+rmnpcX+qLYBa/9Z9OcsYKtmcB5RF/R2fOgnrmx4s32iXtT+8AX2UroVoCZuzGVRfyLR7+no1uvopbelOK0qjqYL/jGAEkPspzoPO4MZx/wnTaHTv56EAl9lVzIhP7myDoM5ydHZZxk2JYOvHMfMtTpDOutk8MOTck+/Aq6IFIUBe/frYr9o1BFQK7FyJ3LdsGMZDldel3p23BMTJxlz5wPSj35xTP8/ELEXHofMWV0VTJirk+M0epLirMftRjJ5wyvE1fQIQHJm03tyz6NCRut0ZSdb7MtlIlI5wxHz8Aag/qMBNJl9OEqlUTB5OZBe41Lk7r6RvDIGueOoCa2fOTB7BH65K/pQAXbi8D4T7zXCz2PiLdzYYJ7gL0m3lzk10JjvEFOVAsMvGDd8o/hznQgf0V7LEPwFSEexnccJpjoHsN+ZUEv8F0OWsw2pjK313I6yQ1rSgeV4Gw50OOB3M4kNHl6+5JcPv4VgUPprewdtnv4rpp7mMfILx4DG5f4I2o9vSGJzobZrY6T3Z9gmExaxS4Nq2qkujdqdrWiUFaCGooR9MMJ8JWf01RrOSV5BCUwAA" alt="">TuTubo</div>
       <label class="search" for="q">
@@ -225,15 +287,27 @@ label.btn{display:inline-flex;align-items:center;cursor:pointer}
       <button class="theme" id="theme" aria-label="Cambiar tema"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
     </div>
   </header>
-
-  <nav class="nav" id="tabs" aria-label="Secciones"><button type="button" data-t="home" aria-selected="true">Inicio</button><button type="button" data-t="shorts" aria-selected="false">Shorts</button><button type="button" data-t="comm" aria-selected="false">Comunidad</button></nav>
+<nav class="rail" id="tabs" aria-label="Secciones">
+  <button type="button" data-t="home" aria-selected="true"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Principal</span></button>
+  <button type="button" data-t="shorts" aria-selected="false"><svg viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="18" rx="4"/><path d="m10.5 9.5 4 2.5-4 2.5z"/></svg><span>Shorts</span></button>
+  <button type="button" data-t="comm" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.5 7.2L4 20.5l1.4-4.6A8 8 0 1 1 21 12z"/></svg><span>Comunidad</span></button>
+  <button type="button" data-t="subs" aria-selected="false"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M6 4h12M9 6h6"/><path d="m10.5 12 3.5 2.5-3.5 2.5z"/></svg><span>Suscripciones</span></button>
+  <button type="button" data-t="you" aria-selected="false"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="10" r="3"/><path d="M6.5 18.5c1.5-2.5 3.2-3.5 5.5-3.5s4 1 5.5 3.5"/></svg><span>Tú</span></button>
+</nav>
+<div class="wrap">
   <section class="chead" id="chanHead" hidden>
-    <div class="chtop"><div class="av bigav" id="chav"></div><div class="chinfo"><h1 id="chname"></h1><p id="chsub"></p></div></div>
-    <nav class="nav" id="chanNav" aria-label="Secciones del canal"><button type="button" data-s="v" aria-selected="true">Videos</button><button type="button" data-s="c" aria-selected="false">Comunidad</button></nav>
+    <div class="banner" id="chbanner"></div>
+    <div class="chtop"><div class="av bigav" id="chav"></div><div class="chinfo"><h1 id="chname"></h1><p id="chsub"></p><p class="chdesc" id="chdesc" hidden></p><div class="chbtns" id="chbtns"></div></div></div>
+    <nav class="nav" id="chanNav" aria-label="Secciones del canal"><button type="button" data-s="v" aria-selected="true">Videos</button><button type="button" data-s="s" aria-selected="false">Shorts</button><button type="button" data-s="p" aria-selected="false">Playlists</button><button type="button" data-s="c" aria-selected="false">Comunidad</button><button type="button" data-s="q" class="ico" aria-selected="false" aria-label="Buscar en el canal"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button></nav>
   </section>
+  <div class="chsearch" id="chSearch" hidden><input id="chq" type="search" placeholder="Buscar en este canal" autocomplete="off" aria-label="Buscar en este canal"></div>
   <div class="controls" id="controls"></div>
   <main class="grid" id="grid" aria-live="polite"></main>
+  <section id="chPl" hidden></section>
   <section id="shortsView" hidden></section>
+  <section id="subsView" hidden></section>
+  <section id="youView" hidden></section>
+  <section id="plPage" hidden></section>
   <section class="cview" id="commView" hidden>
     <div class="cintro" id="cintro" hidden></div>
     <div class="cchips" id="cchips"></div>
@@ -250,10 +324,10 @@ label.btn{display:inline-flex;align-items:center;cursor:pointer}
   </section>
 </div>
 
-<dialog id="watch" aria-label="Reproductor"><button class="close" id="wclose" aria-label="Cerrar">×</button><div class="watch"><div class="stage"><div class="player" id="player"></div><h2 id="wtitle"></h2><div class="wrow"><div class="av" id="wav"></div><div class="meta"><div class="title" id="wch"></div></div></div><div class="desc"><b id="wsub"></b></div>
+<dialog id="watch" aria-label="Reproductor"><button class="close" id="wclose" aria-label="Cerrar">×</button><div class="watch"><div class="stage"><div class="player" id="player"></div><h2 id="wtitle"></h2><div class="wbar"><div class="wrow"><div class="av" id="wav"></div><div class="meta"><div class="title" id="wch"></div></div></div><button type="button" class="btn vsub" id="vsub" hidden>Suscribirse</button><button type="button" class="vlike" id="vlike" aria-pressed="false" title="Me gusta"><svg width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M7 10v11H3V10h4zm0 0 4-8a2.5 2.5 0 0 1 2.5 2.5V8H19a2 2 0 0 1 2 2.3l-1.2 8A2 2 0 0 1 17.8 20H7"/></svg><span id="vln">0</span></button><button type="button" class="vlike vsave" id="vsave" title="Guardar en una playlist"><svg width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg>Guardar</button></div><div class="desc"><b id="wsub"></b></div>
 <section class="cmts" id="cmts"><h3 id="ctitle">Comentarios</h3>
 <form class="cform" id="cform" autocomplete="off"><input type="text" id="ctext" maxlength="500" placeholder="Añade un comentario…" aria-label="Escribe un comentario"><button class="btn primary" type="submit" id="csend">Comentar</button></form>
-<p class="hint" id="chint"></p><div id="clist"></div></section></div><aside class="side"><h3>Siguientes</h3><div id="next"></div></aside></div></dialog>
+<p class="hint" id="chint"></p><div id="clist"></div></section></div><aside class="side"><div id="plPanel"></div><h3>Siguientes</h3><div id="next"></div></aside></div></dialog>
 
 <dialog id="uploadDlg" aria-label="Subir video"><form class="form" id="form" method="dialog">
   <h2>Subir video</h2>
@@ -285,6 +359,29 @@ label.btn{display:inline-flex;align-items:center;cursor:pointer}
   <input type="file" id="accfile" accept="image/*" hidden>
   <div class="btns"><button type="button" class="btn" id="chphoto">Cambiar foto</button><button type="button" class="btn" id="mychan">Ver mi canal</button><button type="button" class="btn primary" id="logout">Cerrar sesión</button></div>
 </div></dialog>
+<dialog id="saveDlg" aria-label="Guardar en una playlist" style="width:min(380px,calc(100% - 24px))"><button class="close" id="saveclose" type="button" aria-label="Cerrar">×</button>
+<form class="form" id="saveForm" autocomplete="off">
+  <h2>Guardar en…</h2>
+  <div class="savelist" id="saveList"></div>
+  <label for="sv-new">Nueva playlist<input type="text" id="sv-new" maxlength="80" placeholder="Nombre de la playlist"></label>
+  <div class="btns"><button type="submit" class="btn primary">Crear y guardar</button></div>
+</form></dialog>
+<dialog id="plDlg" aria-label="Nueva playlist" style="width:min(380px,calc(100% - 24px))"><button class="close" id="plclose" type="button" aria-label="Cerrar">×</button>
+<form class="form" id="plForm" autocomplete="off">
+  <h2>Nueva playlist</h2>
+  <label for="pl-title">Nombre<input type="text" id="pl-title" maxlength="80" placeholder="Ej. Mis favoritos"></label>
+  <p class="hint">Las playlists son públicas: aparecen en la pestaña Playlists de tu canal.</p>
+  <div class="btns"><button type="submit" class="btn primary">Crear</button></div>
+</form></dialog>
+<dialog id="custDlg" aria-label="Personalizar canal" style="width:min(460px,calc(100% - 24px))"><button class="close" id="custclose" type="button" aria-label="Cerrar">×</button>
+<form class="form" id="custForm" autocomplete="off">
+  <h2>Personalizar canal</h2>
+  <div class="bprev" id="c-prev">Sin banner</div>
+  <div class="btns" style="justify-content:flex-start"><label class="btn" for="c-file">Elegir banner</label><input type="file" id="c-file" accept="image/*" hidden><button type="button" class="btn" id="c-clear">Quitar banner</button></div>
+  <label for="c-desc">Descripción del canal<textarea id="c-desc" maxlength="300" rows="3" placeholder="Cuéntales de qué trata tu canal"></textarea></label>
+  <p class="err" id="cerr" role="alert"></p>
+  <div class="btns"><button type="button" class="btn" id="custcancel">Cancelar</button><button type="submit" class="btn primary">Guardar</button></div>
+</form></dialog>
 <div class="toast" id="toast" role="status"></div>
 
 <script>
@@ -337,8 +434,8 @@ function thumb(v,small){
   return t;
 }
 function list(){
-  var q=norm(term);
-  var a=VIDEOS.filter(function(v){return !v.short&&(!chan||v.c===chan)&&(!q||norm(v.t+" "+v.c).indexOf(q)>-1)});
+  var q=norm(chan&&csub==="q"?chterm:term),only=!!chan&&csub==="s",any=!!chan&&csub==="q";
+  var a=VIDEOS.filter(function(v){return (only?!!v.short:any?true:!v.short)&&(!chan||v.c===chan)&&(!q||norm(v.t+" "+v.c).indexOf(q)>-1)});
   a.sort(function(x,y){return sort==="views"?(y.v-x.v)||(x.d-y.d):(x.d-y.d)||(y.v-x.v)});
   return a;
 }
@@ -348,25 +445,27 @@ function controls(n){
     var b=el("button","chip",p[1]);b.setAttribute("aria-pressed",String(sort===p[0]));b.onclick=function(){sort=p[0];render()};c.appendChild(b)});
   c.appendChild(el("span","count",n+(n===1?" video":" videos")));
 }
+function cardEl(v){
+  var card=el("div","card");card.tabIndex=0;card.setAttribute("role","button");card.setAttribute("aria-label","Ver "+v.t);
+  card.appendChild(thumb(v));
+  var row=el("div","row"),av=el("div","av",initial(v.c));av.style.setProperty("--h",hue(v.c));fillAv(av,v.c);
+  var m=el("div","meta");m.appendChild(el("div","title",v.t));
+  var s=el("div","sub");var ch=el("button","ch",v.c);ch.onclick=function(e){e.stopPropagation();goChan(v.c)};
+  s.appendChild(ch);s.appendChild(document.createTextNode(" · "+views(v.v)+" · "+ago(v.d)));m.appendChild(s);
+  row.appendChild(av);row.appendChild(m);card.appendChild(row);
+  card.onclick=function(){open(v)};card.onkeydown=function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();open(v)}};
+  return card;
+}
 function render(){
   renderChanHead();
   if(tab==="shorts")renderShorts(false);
-  var a=list(),g=$("#grid");g.innerHTML="";controls(a.length);
-  if(!a.length){var e=el("div","empty");e.appendChild(el("b",null,"No hay videos"));e.appendChild(document.createTextNode("Prueba con otra palabra o sube el primero."));g.appendChild(e);return}
-  a.forEach(function(v){
-    var card=el("div","card");card.tabIndex=0;card.setAttribute("role","button");card.setAttribute("aria-label","Ver "+v.t);
-    card.appendChild(thumb(v));
-    var row=el("div","row"),av=el("div","av",initial(v.c));av.style.setProperty("--h",hue(v.c));fillAv(av,v.c);
-    var m=el("div","meta");m.appendChild(el("div","title",v.t));
-    var s=el("div","sub");var ch=el("button","ch",v.c);ch.onclick=function(e){e.stopPropagation();goChan(v.c)};
-    s.appendChild(ch);s.appendChild(document.createTextNode(" · "+views(v.v)+" · "+ago(v.d)));m.appendChild(s);
-    row.appendChild(av);row.appendChild(m);card.appendChild(row);
-    card.onclick=function(){open(v)};card.onkeydown=function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();open(v)}};
-    g.appendChild(card);
-  });
+  paintViews();
+  var a=list(),g=$("#grid"),sh=!!chan&&csub==="s";g.innerHTML="";g.classList.toggle("shorts",sh);controls(a.length);
+  if(!a.length){var e=el("div","empty");e.appendChild(el("b",null,sh?"No hay shorts":"No hay videos"));e.appendChild(document.createTextNode(chan?(sh?"Este canal no ha subido shorts.":"Este canal no tiene videos que coincidan."):"Prueba con otra palabra o sube el primero."));g.appendChild(e);return}
+  a.forEach(function(v){g.appendChild(cardEl(v))});
 }
-function open(v){
-  cur=v;bump(v);
+function open(v,plx){
+  curPL=plx||null;cur=v;bump(v);
   var pl=$("#player");pl.innerHTML="";pl.style.padding="";pl.style.position="";
   if(v.url||v.blobUrl){playSrc(pl,v.url||v.blobUrl)}
   else if(v.fid&&v.chunks>0){pl.style.padding="16px";var ld=el("p",null,"Cargando video…");pl.appendChild(ld);
@@ -383,12 +482,13 @@ function open(v){
     var b=el("button","next");b.appendChild(thumb(x,true));
     var m=el("div","meta");m.appendChild(el("div","title",x.t));m.appendChild(el("div","sub",x.c+" · "+views(x.v)));b.appendChild(m);
     b.onclick=function(){open(x)};n.appendChild(b)});
-  loadComments(v);
+  paintSubBtn();paintPLPanel();
+  loadComments(v);loadLikes(v);
   var d=$("#watch");if(!d.open)d.show();
   enterWatch();
   render();
 }
-function stop(){var p=$("#player").querySelector("video");if(p)p.pause();if(cunsub){cunsub();cunsub=null}}
+function stop(){var p=$("#player").querySelector("video");if(p)p.pause();if(cunsub){cunsub();cunsub=null}if(lunsub){lunsub();lunsub=null}}
 function enterWatch(){
   document.body.classList.add("watching");
   applyViews();
@@ -439,7 +539,7 @@ $("#form").addEventListener("submit",function(e){
   });
 });
 $("#uploadDlg").addEventListener("click",function(e){if(e.target===this)this.close()});
-$("#q").addEventListener("input",function(e){term=e.target.value;if($("#watch").open)leaveWatch();if(term&&csub==="c")csub="v";if(tab!=="home")setTab("home");applyViews();render()});
+$("#q").addEventListener("input",function(e){term=e.target.value;if($("#watch").open)leaveWatch();if(chan){chan="";csub="v"}if(tab!=="home")setTab("home");plOpen=null;applyViews();render()});
 $("#theme").onclick=function(){var r=document.documentElement,dark=r.dataset.theme?r.dataset.theme==="dark":matchMedia("(prefers-color-scheme:dark)").matches;r.dataset.theme=dark?"light":"dark"};
 
 /* ===== Cuentas =====
@@ -509,7 +609,7 @@ function loadCloud(){
       if(!u){me=null;refreshAcct();return}
       loadProfile(u).then(function(){refreshAcct();render()},function(){me=null;refreshAcct()});
     });
-    render();startVideos();syncComm();
+    render();startVideos();syncComm();startMeta();
   });
   ready.catch(function(){});
 }
@@ -535,7 +635,7 @@ function authErr(er,up){
 
 
 /* ---- videos compartidos (Firestore): ficha + trozos del archivo ---- */
-function playSrc(pl,src){var vid=el("video");vid.src=src;vid.controls=true;vid.autoplay=true;pl.appendChild(vid)}
+function playSrc(pl,src){var vid=el("video");vid.src=src;vid.controls=true;vid.autoplay=true;vid.addEventListener("ended",playNext);pl.appendChild(vid)}
 function startVideos(){
   db.collection("videos").orderBy("ts","desc").limit(100).onSnapshot(function(sn){
     var old={};VIDEOS.forEach(function(x){if(x.fid)old[x.fid]=x});
@@ -607,6 +707,33 @@ function loadVideo(v){
 var LC={},cunsub=null,CL=[];
 function ckey(v){return v.fid||"s"+v.id}
 function agoMs(ts){var m=Math.floor((Date.now()-ts)/6e4);if(m<1)return "hace un momento";if(m<60)return "hace "+m+" min";var h=Math.floor(m/60);if(h<24)return "hace "+h+(h===1?" hora":" horas");return ago(Math.floor(h/24))}
+/* me gusta de los videos: un documento likes/<video> con la lista de quienes dieron like */
+var vlk={a:[]},lunsub=null,LVL={};
+function paintLike(){
+  var b=$("#vlike"),on=!!me&&vlk.a.indexOf(ident())>-1;
+  b.className="vlike"+(on?" on":"");b.setAttribute("aria-pressed",String(on));$("#vln").textContent=vlk.a.length;
+}
+function loadLikes(v){
+  if(lunsub){lunsub();lunsub=null}
+  var k=ckey(v);vlk={a:[]};paintLike();
+  if(CLOUD){
+    if(!db)return;
+    lunsub=db.collection("likes").doc(k).onSnapshot(function(d){
+      if(cur!==v)return;
+      vlk={a:(d.exists&&d.data().likedBy)||[]};paintLike();
+    },function(){});
+  }else{vlk={a:(LVL[k]||[]).slice()};paintLike()}
+}
+$("#vlike").onclick=function(){
+  var v=cur;if(!v)return;
+  if(!me){toast("Inicia sesión para dar like");openAuth("in");return}
+  var k=ckey(v),id=ident(),liked=vlk.a.indexOf(id)>-1;
+  if(CLOUD){
+    var FV=firebase.firestore.FieldValue,ref=db.collection("likes").doc(k);
+    (liked?ref.update({likedBy:FV.arrayRemove(id)}):ref.set({likedBy:FV.arrayUnion(id)},{merge:true})).catch(permErr("No se pudo dar like"));
+  }else{var a=LVL[k]=LVL[k]||[],i=a.indexOf(id);if(i>-1)a.splice(i,1);else a.push(id);loadLikes(v)}
+  LIKED=null;
+};
 /* hilo de comentarios: me gusta y respuestas (sirve para videos y para publicaciones) */
 var RO={},RD={},RX={};
 function ident(){return CLOUD?((auth&&auth.currentUser&&auth.currentUser.uid)||""):(me||"")}
@@ -741,39 +868,342 @@ function readImage(file,max){
     im.src=url;
   });
 }
-var csub="v",csort="top",pkey="";
+var csub="v",csort="top",pkey="",plOpen=null,curPL=null,chterm="";
 /* qué comunidad se muestra: "*" = todas (pestaña Comunidad), nombre = comunidad de ese canal, null = ninguna */
 function commMode(){if(tab==="comm")return "*";if(tab==="home"&&chan&&csub==="c")return chan;return null}
 function applyViews(){
-  var w=document.body.classList.contains("watching"),cm=commMode(),vid=tab==="home"&&!(chan&&csub==="c");
-  $("#tabs").hidden=w;
-  $("#chanHead").hidden=w||tab!=="home"||!chan;
-  $("#controls").hidden=$("#grid").hidden=w||!vid;
-  $("#shortsView").hidden=w||tab!=="shorts";
-  $("#commView").hidden=w||cm===null;
+  var w=document.body.classList.contains("watching"),pl=!!plOpen&&!w,home=tab==="home"&&!w&&!pl;
+  var gridv=home&&(!chan||csub==="v"||csub==="s"||csub==="q");
+  function show(sel,on){$(sel).hidden=!on}
+  show("#tabs",!w);
+  show("#chanHead",home&&!!chan);
+  show("#chSearch",home&&!!chan&&csub==="q");
+  show("#controls",gridv);show("#grid",gridv);
+  show("#chPl",home&&!!chan&&csub==="p");
+  show("#shortsView",!w&&!pl&&tab==="shorts");
+  show("#commView",!w&&!pl&&commMode()!==null);
+  show("#subsView",!w&&!pl&&tab==="subs");
+  show("#youView",!w&&!pl&&tab==="you");
+  show("#plPage",pl);
   syncComm();
 }
-function syncComm(){var m=commMode();if(m===null||document.body.classList.contains("watching")){postsUnsub();return}postsSub(m)}
-function renderChanHead(){
-  if(tab!=="home"||!chan)return;
-  var c=chan,n=VIDEOS.filter(function(v){return !v.short&&v.c===c}).length;
-  paintAv($("#chav"),c,avSrc(c));
-  $("#chname").textContent=csub==="c"?"Comunidad de "+c:c;
-  $("#chsub").textContent="Público · "+n+(n===1?" video":" videos");
-  document.querySelectorAll("#chanNav button").forEach(function(b){b.setAttribute("aria-selected",String(b.dataset.s===csub))});
-}
-function goChan(name,sub){chan=name;csub=sub||"v";term="";$("#q").value="";setTab("home");render()}
-document.querySelectorAll("#chanNav button").forEach(function(b){b.onclick=function(){csub=b.dataset.s;applyViews();render()}});
+function syncComm(){var m=commMode();if(m===null||plOpen||document.body.classList.contains("watching")){postsUnsub();return}postsSub(m)}
+function goChan(name,sub){chan=name;csub=sub||"v";term="";chterm="";$("#q").value="";$("#chq").value="";setTab("home");render()}
+document.querySelectorAll("#chanNav button").forEach(function(b){b.onclick=function(){csub=b.dataset.s;applyViews();render();if(csub==="q")$("#chq").focus()}});
+$("#chq").addEventListener("input",function(){chterm=this.value;render()});
 function setTab(t){
   if($("#watch").open)leaveWatch();
-  var prev=tab;tab=t;
+  var prev=tab;tab=t;plOpen=null;
   document.querySelectorAll("#tabs button").forEach(function(b){b.setAttribute("aria-selected",String(b.dataset.t===t))});
   applyViews();
   if(prev==="shorts"&&t!=="shorts")pauseShorts();
   if(t==="shorts")renderShorts(true);
+  paintViews();
   window.scrollTo(0,0);
 }
 document.querySelectorAll("#tabs button").forEach(function(b){b.onclick=function(){var h=b.dataset.t==="home";if(h){chan="";csub="v"}setTab(b.dataset.t);if(h)render()}});
+
+/* ===== Biblioteca: canal (banner), suscripciones y playlists ===== */
+var SUBS={},PLALL=[],LPLS=[],CHI={},CHP={},LIKED=null,LKB=false,newBanner=null;
+function toastErr(er,m){toast(er&&er.code==="permission-denied"?"Sin permiso: faltan las reglas nuevas de Firestore":((er&&!er.code&&er.message)||m))}
+function vidByKey(k){for(var i=0;i<VIDEOS.length;i++)if(ckey(VIDEOS[i])===k)return VIDEOS[i];return null}
+function ownChan(c){return !!me&&ukey(me)===ukey(c)}
+
+/* banner y descripción del canal */
+function fetchInfo(c){
+  var k=ukey(c);
+  if(CHI[k])return Promise.resolve(CHI[k]);
+  if(!CLOUD)return Promise.resolve(CHI[k]={img:"",desc:""});
+  if(!db)return Promise.resolve({img:"",desc:""});
+  if(CHP[k])return CHP[k];
+  CHP[k]=keyH(c).then(function(h){return db.collection("banners").doc(h).get()}).then(function(d){
+    var o=d.exists?d.data():{};delete CHP[k];return CHI[k]={img:o.img||"",desc:o.desc||""};
+  },function(er){delete CHP[k];throw er});
+  CHP[k].then(function(){renderChanHead()},function(){});
+  return CHP[k];
+}
+function chInfo(c){var k=ukey(c);if(!CHI[k]&&!CHP[k])fetchInfo(c).catch(function(){});return CHI[k]||{img:"",desc:""}}
+function renderChanHead(){
+  if(tab!=="home"||!chan||plOpen||document.body.classList.contains("watching"))return;
+  var c=chan,vs=0,ss=0;
+  VIDEOS.forEach(function(v){if(v.c===c){if(v.short)ss++;else vs++}});
+  paintAv($("#chav"),c,avSrc(c));
+  var inf=chInfo(c),ban=$("#chbanner");
+  ban.style.setProperty("--h",hue(c));
+  ban.className="banner"+(inf.img?"":" def");
+  ban.style.backgroundImage=inf.img?"url("+JSON.stringify(inf.img)+")":"";
+  $("#chname").textContent=c;
+  var n=subCount(c);
+  $("#chsub").textContent=n+(n===1?" suscriptor":" suscriptores")+" · "+vs+(vs===1?" video":" videos")+(ss?" · "+ss+(ss===1?" short":" shorts"):"");
+  var d=$("#chdesc");d.hidden=!inf.desc;d.textContent=inf.desc||"";d.classList.remove("open");d.onclick=function(){d.classList.toggle("open")};
+  var bt=$("#chbtns");bt.innerHTML="";
+  if(ownChan(c)){var cb=el("button","btn","Personalizar canal");cb.type="button";cb.onclick=openCust;bt.appendChild(cb)}
+  else{var on=isSub(c),sb=el("button","btn"+(on?"":" primary"),on?"Suscrito ✓":"Suscribirse");sb.type="button";sb.setAttribute("aria-pressed",String(on));sb.onclick=function(){toggleSub(c)};bt.appendChild(sb)}
+  document.querySelectorAll("#chanNav button").forEach(function(b){b.setAttribute("aria-selected",String(b.dataset.s===csub))});
+}
+function readBanner(file){
+  return new Promise(function(ok,no){
+    if(!file||!/^image\//.test(file.type))return no(new Error("Elige un archivo de imagen."));
+    var url=URL.createObjectURL(file),im=new Image();
+    im.onload=function(){
+      var W=1280,H=240,c=document.createElement("canvas");c.width=W;c.height=H;
+      var r=Math.max(W/im.width,H/im.height),w=im.width*r,h=im.height*r;
+      c.getContext("2d").drawImage(im,(W-w)/2,(H-h)/2,w,h);URL.revokeObjectURL(url);
+      var d=c.toDataURL("image/jpeg",.82);if(d.length>230000)d=c.toDataURL("image/jpeg",.6);
+      d.length>230000?no(new Error("La imagen es demasiado pesada.")):ok(d);
+    };
+    im.onerror=function(){URL.revokeObjectURL(url);no(new Error("No se pudo leer esa imagen."))};
+    im.src=url;
+  });
+}
+function paintBannerPrev(img){var b=$("#c-prev");b.style.backgroundImage=img?"url("+JSON.stringify(img)+")":"";b.textContent=img?"":"Sin banner"}
+function openCust(){
+  if(!me)return;
+  if($("#accDlg").open)$("#accDlg").close();
+  fetchInfo(me).then(function(inf){
+    newBanner=null;paintBannerPrev(inf.img);$("#c-desc").value=inf.desc||"";$("#cerr").textContent="";$("#c-file").value="";
+    $("#custDlg").showModal();
+  },function(){toast("No se pudo cargar tu canal. Inténtalo de nuevo.")});
+}
+$("#c-file").addEventListener("change",function(){
+  var f=this.files[0];if(!f)return;
+  readBanner(f).then(function(d){newBanner=d;paintBannerPrev(d);$("#cerr").textContent=""},function(er){$("#cerr").textContent=er.message});
+});
+$("#c-clear").onclick=function(){newBanner="";paintBannerPrev("");$("#c-file").value=""};
+$("#custcancel").onclick=$("#custclose").onclick=function(){$("#custDlg").close()};
+$("#custDlg").addEventListener("click",function(e){if(e.target===this)this.close()});
+$("#custForm").addEventListener("submit",function(e){
+  e.preventDefault();if(!me)return;
+  var k=ukey(me),old=CHI[k]||{img:"",desc:""},img=newBanner===null?old.img:newBanner,desc=$("#c-desc").value.trim().slice(0,300);
+  var btn=$("#custForm button[type=submit]");btn.disabled=true;
+  (CLOUD?keyH(me).then(function(h){return db.collection("banners").doc(h).set({uid:auth.currentUser.uid,img:img,desc:desc})}):Promise.resolve())
+    .then(function(){CHI[k]={img:img,desc:desc};$("#custDlg").close();renderChanHead();toast("Canal actualizado")},function(er){toastErr(er,"No se pudo guardar el canal")})
+    .then(function(){btn.disabled=false});
+});
+
+/* suscripciones: un documento subs/<canal> con la lista de quienes se suscribieron */
+function subKey(c){return encodeURIComponent(ukey(c))}
+function subBy(c){var o=SUBS[subKey(c)];return o?o.by:[]}
+function subCount(c){return subBy(c).length}
+function isSub(c){return !!me&&subBy(c).indexOf(ident())>-1}
+function mySubs(){var id=ident(),r=[];if(!me)return r;for(var k in SUBS)if(SUBS[k].by.indexOf(id)>-1)r.push(SUBS[k].name);return r.sort()}
+function toggleSub(c){
+  if(!me){toast("Inicia sesión para suscribirte");openAuth("in");return}
+  var k=subKey(c),id=ident(),on=subBy(c).indexOf(id)>-1;
+  if(CLOUD){
+    var FV=firebase.firestore.FieldValue,ref=db.collection("subs").doc(k);
+    var op=SUBS[k]?ref.update({by:on?FV.arrayRemove(id):FV.arrayUnion(id)}):ref.set({name:c,by:FV.arrayUnion(id)},{merge:true});
+    op.then(function(){toast(on?"Ya no sigues a "+c:"Te suscribiste a "+c)},function(er){toastErr(er,"No se pudo cambiar la suscripción")});
+  }else{
+    var o=SUBS[k]=SUBS[k]||{name:c,by:[]},i=o.by.indexOf(id);if(i>-1)o.by.splice(i,1);else o.by.push(id);
+    toast(i>-1?"Ya no sigues a "+c:"Te suscribiste a "+c);metaChanged();
+  }
+}
+function paintSubBtn(){
+  var b=$("#vsub");if(!cur){b.hidden=true;return}
+  b.hidden=ownChan(cur.c);
+  var on=isSub(cur.c);b.textContent=on?"Suscrito ✓":"Suscribirse";b.className="btn vsub"+(on?"":" primary");b.setAttribute("aria-pressed",String(on));
+}
+$("#vsub").onclick=function(){if(cur)toggleSub(cur.c)};
+
+/* playlists: playlists/<id> = {uid, owner (canal), title, vids:[claves de video], ts} */
+function plList(){return CLOUD?PLALL:LPLS}
+function plById(id){var a=plList();for(var i=0;i<a.length;i++)if(a[i].id===id)return a[i];return null}
+function plMine(p){return !!me&&(CLOUD?p.uid===ident():p.owner===me)}
+function myPls(){return plList().filter(plMine).sort(function(a,b){return b.ts-a.ts})}
+function likedPL(){return {id:"liked",virtual:true,title:"Videos que me gustan",owner:me||"",vids:LIKED||[],ts:0}}
+function plNow(){return plOpen?(plOpen.virtual?likedPL():plById(plOpen.id)):null}
+function plNew(title,firstKey){
+  title=title.replace(/\s+/g," ").trim().slice(0,80);
+  if(!title)return Promise.reject(new Error("Escribe un nombre para la playlist."));
+  var vids=firstKey?[firstKey]:[];
+  if(CLOUD)return db.collection("playlists").add({uid:auth.currentUser.uid,owner:me,title:title,vids:vids,ts:Date.now()}).then(function(r){return r.id});
+  var o={id:"p"+Date.now()+Math.random().toString(36).slice(2,5),uid:"",owner:me,title:title,vids:vids,ts:Date.now()};
+  LPLS.unshift(o);metaChanged();return Promise.resolve(o.id);
+}
+function plAdd(p,k){
+  if(p.vids.indexOf(k)>-1)return Promise.resolve();
+  if(p.vids.length>=200){toast("Una playlist admite hasta 200 videos");return Promise.resolve()}
+  if(CLOUD)return db.collection("playlists").doc(p.id).update({vids:firebase.firestore.FieldValue.arrayUnion(k)}).catch(function(er){toastErr(er,"No se pudo guardar en la playlist")});
+  p.vids.push(k);metaChanged();return Promise.resolve();
+}
+function plDrop(p,k){
+  if(CLOUD)return db.collection("playlists").doc(p.id).update({vids:firebase.firestore.FieldValue.arrayRemove(k)}).catch(function(er){toastErr(er,"No se pudo quitar de la playlist")});
+  var i=p.vids.indexOf(k);if(i>-1)p.vids.splice(i,1);metaChanged();return Promise.resolve();
+}
+function plRename(p){
+  var t=prompt("Nuevo nombre de la playlist",p.title);if(t==null)return;
+  t=t.replace(/\s+/g," ").trim().slice(0,80);if(!t)return;
+  if(CLOUD)db.collection("playlists").doc(p.id).update({title:t}).catch(function(er){toastErr(er,"No se pudo renombrar")});
+  else{p.title=t;metaChanged()}
+}
+function plDelete(p){
+  if(!confirm("¿Eliminar la playlist «"+p.title+"»?"))return;
+  var back=function(){plOpen=null;applyViews();render();toast("Playlist eliminada")};
+  if(CLOUD)db.collection("playlists").doc(p.id)["delete"]().then(back,function(er){toastErr(er,"No se pudo eliminar")});
+  else{LPLS=LPLS.filter(function(x){return x.id!==p.id});back()}
+}
+function loadLiked(){
+  if(!me||LKB)return;
+  if(!CLOUD||!db){LIKED=Object.keys(LVL).filter(function(k){return LVL[k].indexOf(me)>-1});paintViews();return}
+  LKB=true;
+  db.collection("likes").where("likedBy","array-contains",ident()).get().then(function(sn){LIKED=[];sn.forEach(function(d){LIKED.push(d.id)})},function(){LIKED=[]}).then(function(){LKB=false;paintViews()});
+}
+function startMeta(){
+  db.collection("playlists").orderBy("ts","desc").limit(200).onSnapshot(function(sn){
+    PLALL=[];sn.forEach(function(d){var o=d.data();PLALL.push({id:d.id,uid:o.uid,owner:o.owner||"",title:o.title||"",vids:o.vids||[],ts:o.ts||0})});metaChanged();
+  },function(){});
+  db.collection("subs").limit(500).onSnapshot(function(sn){
+    SUBS={};sn.forEach(function(d){var o=d.data();SUBS[d.id]={name:o.name||"",by:o.by||[]}});metaChanged();
+  },function(){});
+}
+function metaChanged(){
+  if(document.body.classList.contains("watching")){paintSubBtn();paintPLPanel()}
+  else{renderChanHead();paintViews()}
+  if($("#saveDlg").open)renderSave();
+}
+function paintViews(){
+  if(document.body.classList.contains("watching"))return;
+  if(me&&LIKED===null&&((tab==="you"&&!plOpen)||(plOpen&&plOpen.virtual)))loadLiked();
+  if(plOpen)renderPlPage();
+  else if(tab==="subs")renderSubs();
+  else if(tab==="you")renderYou();
+  else if(tab==="home"&&chan&&csub==="p")renderChPl();
+}
+function openPlaylist(p){plOpen={id:p.id,virtual:!!p.virtual};applyViews();paintViews();window.scrollTo(0,0)}
+function playFromPL(p,i){var v=vidByKey(p.vids[i]);if(v)open(v,{id:p.id,virtual:!!p.virtual})}
+function playNext(){
+  if(!curPL||!cur)return;
+  var p=curPL.virtual?likedPL():plById(curPL.id);if(!p)return;
+  for(var j=p.vids.indexOf(ckey(cur))+1;j<p.vids.length;j++){var v=vidByKey(p.vids[j]);if(v){open(v,curPL);return}}
+}
+function paintPLPanel(){
+  var b=$("#plPanel");b.innerHTML="";
+  if(!curPL)return;
+  var p=curPL.virtual?likedPL():plById(curPL.id);if(!p){curPL=null;return}
+  var box=el("div","plpanel"),k=cur?ckey(cur):"",i=p.vids.indexOf(k);
+  box.appendChild(el("h3",null,p.title));
+  box.appendChild(el("div","cnt",p.owner+" · "+(i>-1?(i+1)+" / ":"")+p.vids.length));
+  var l=el("div","lst");
+  p.vids.forEach(function(key,idx){
+    var v=vidByKey(key);if(!v)return;
+    var r=el("button","next"+(key===k?" curv":""));r.type="button";r.appendChild(thumb(v,true));
+    var m=el("div","meta");m.appendChild(el("div","title",v.t));m.appendChild(el("div","sub",v.c));r.appendChild(m);
+    r.onclick=function(){playFromPL(p,idx)};l.appendChild(r);
+  });
+  box.appendChild(l);b.appendChild(box);
+}
+/* guardar el video actual en una playlist */
+function renderSave(){
+  var box=$("#saveList");box.innerHTML="";if(!cur)return;
+  var k=ckey(cur),a=myPls();
+  if(!a.length)box.appendChild(el("p","hint","Aún no tienes playlists. Crea la primera aquí abajo."));
+  a.forEach(function(p){
+    var lb=el("label","chk"),cb=el("input");cb.type="checkbox";cb.checked=p.vids.indexOf(k)>-1;
+    cb.onchange=function(){var on=cb.checked;(on?plAdd(p,k):plDrop(p,k)).then(function(){toast(on?"Guardado en "+p.title:"Quitado de "+p.title)})};
+    lb.appendChild(cb);lb.appendChild(el("span",null,p.title));lb.appendChild(el("small",null,String(p.vids.length)));box.appendChild(lb);
+  });
+}
+$("#vsave").onclick=function(){
+  if(!cur)return;
+  if(!me){toast("Inicia sesión para guardar videos");openAuth("in");return}
+  renderSave();$("#sv-new").value="";$("#saveDlg").showModal();
+};
+$("#saveForm").addEventListener("submit",function(e){
+  e.preventDefault();if(!cur||!me)return;
+  plNew($("#sv-new").value,ckey(cur)).then(function(){$("#sv-new").value="";toast("Playlist creada y video guardado")},function(er){toastErr(er,"No se pudo crear la playlist")});
+});
+$("#saveclose").onclick=function(){$("#saveDlg").close()};
+$("#saveDlg").addEventListener("click",function(e){if(e.target===this)this.close()});
+function openNewPL(){
+  if(!me){toast("Inicia sesión para crear playlists");openAuth("in");return}
+  $("#pl-title").value="";$("#plDlg").showModal();$("#pl-title").focus();
+}
+$("#plForm").addEventListener("submit",function(e){
+  e.preventDefault();
+  plNew($("#pl-title").value,null).then(function(){$("#plDlg").close();toast("Playlist creada")},function(er){toastErr(er,"No se pudo crear la playlist")});
+});
+$("#plclose").onclick=function(){$("#plDlg").close()};
+$("#plDlg").addEventListener("click",function(e){if(e.target===this)this.close()});
+
+/* pantallas: playlists, Tú, Suscripciones */
+function plCard(p){
+  var card=el("div","card plcard");card.tabIndex=0;card.setAttribute("role","button");card.setAttribute("aria-label","Abrir playlist "+p.title);
+  var first=null;for(var i=0;i<p.vids.length&&!first;i++)first=vidByKey(p.vids[i]);
+  var t=first?thumb(first,true):el("div","thumb");
+  if(!first){t.style.setProperty("--h",hue(p.title));t.appendChild(el("span","big","☰"))}
+  t.appendChild(el("span","plbadge","☰ "+p.vids.length));
+  card.appendChild(t);
+  var m=el("div","meta");m.appendChild(el("div","title",p.title));m.appendChild(el("div","sub",p.owner+" · Playlist"));card.appendChild(m);
+  card.onclick=function(){openPlaylist(p)};card.onkeydown=function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();openPlaylist(p)}};
+  return card;
+}
+function renderPlPage(){
+  var box=$("#plPage");box.innerHTML="";
+  var p=plNow();
+  if(!p){box.appendChild(emptyBox("Playlist no encontrada","Puede que se haya eliminado."));return}
+  var mine=!p.virtual&&plMine(p),h=el("div","plhead");
+  h.appendChild(el("h1",null,p.title));
+  var info=el("p"),nm=el("button","nm",p.owner);nm.type="button";nm.onclick=function(){goChan(p.owner,p.virtual?"v":"p")};
+  info.appendChild(nm);info.appendChild(document.createTextNode(" · "+p.vids.length+(p.vids.length===1?" video":" videos")+(p.virtual?"":" · Playlist pública")));h.appendChild(info);
+  var first=-1;p.vids.forEach(function(k,i){if(first<0&&vidByKey(k))first=i});
+  if(first>-1){var pb=el("button","btn primary","▶ Reproducir todo");pb.type="button";pb.onclick=function(){playFromPL(p,first)};h.appendChild(pb)}
+  if(mine){var rb=el("button","btn","Renombrar");rb.type="button";rb.onclick=function(){plRename(p)};h.appendChild(rb);
+    var db2=el("button","btn","Eliminar playlist");db2.type="button";db2.onclick=function(){plDelete(p)};h.appendChild(db2)}
+  box.appendChild(h);
+  if(!p.vids.length||(p.virtual&&LIKED===null)){box.appendChild(emptyBox(p.virtual&&LIKED===null?"Cargando…":"Playlist vacía",p.virtual?"":"Guarda videos con el botón «Guardar» de la página del video."));return}
+  var list=el("div");
+  p.vids.forEach(function(k,i){
+    var v=vidByKey(k);if(!v)return;
+    var r=el("div","plrow");r.tabIndex=0;r.setAttribute("role","button");
+    r.appendChild(el("span","pln",String(i+1)));r.appendChild(thumb(v,true));
+    var m=el("div","meta");m.appendChild(el("div","title",v.t));m.appendChild(el("div","sub",v.c+" · "+views(v.v)+" · "+ago(v.d)));r.appendChild(m);
+    if(mine){var x=el("button","del","Quitar");x.type="button";x.onclick=function(e){e.stopPropagation();plDrop(p,k)};r.appendChild(x)}
+    r.onclick=function(){playFromPL(p,i)};r.onkeydown=function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();playFromPL(p,i)}};
+    list.appendChild(r);
+  });
+  box.appendChild(list);
+}
+function renderChPl(){
+  var box=$("#chPl");box.innerHTML="";
+  var own=ownChan(chan);
+  if(own){var nb=el("button","btn primary","+ Nueva playlist");nb.type="button";nb.style.margin="16px 0 4px";nb.onclick=openNewPL;box.appendChild(nb)}
+  var a=plList().filter(function(p){return ukey(p.owner)===ukey(chan)}).sort(function(x,y){return y.ts-x.ts});
+  if(!a.length){box.appendChild(emptyBox("Sin playlists",own?"Crea una con el botón de arriba.":"Este canal no ha creado playlists."));return}
+  var g=el("div","grid");g.style.marginTop="16px";a.forEach(function(p){g.appendChild(plCard(p))});box.appendChild(g);
+}
+function loginBox(b,msg){
+  b.appendChild(emptyBox("Inicia sesión",msg));
+  var lb=el("button","btn primary","Iniciar sesión");lb.type="button";lb.style.margin="14px auto 0";lb.style.display="block";lb.onclick=function(){openAuth("in")};b.appendChild(lb);
+}
+function renderYou(){
+  var box=$("#youView");box.innerHTML="";
+  if(!me){loginBox(box,"Entra a tu cuenta para ver tu canal y tus playlists.");return}
+  var top=el("div","chtop"),av=el("div","av bigav");paintAv(av,me,avSrc(me));
+  var inf=el("div","chinfo");inf.appendChild(el("h1",null,me));inf.appendChild(el("p",null,"Tu cuenta"));
+  var bt=el("div","chbtns"),b1=el("button","btn primary","Ver mi canal");b1.type="button";b1.onclick=function(){goChan(me,"v")};
+  var b2=el("button","btn","Personalizar canal");b2.type="button";b2.onclick=openCust;
+  bt.appendChild(b1);bt.appendChild(b2);inf.appendChild(bt);top.appendChild(av);top.appendChild(inf);box.appendChild(top);
+  var sh=el("div","sech");sh.appendChild(el("h2",null,"Playlists"));
+  var nb=el("button","btn primary","+ Nueva playlist");nb.type="button";nb.onclick=openNewPL;sh.appendChild(nb);box.appendChild(sh);
+  var g=el("div","grid");
+  g.appendChild(plCard(likedPL()));
+  myPls().forEach(function(p){g.appendChild(plCard(p))});
+  box.appendChild(g);
+}
+function renderSubs(){
+  var box=$("#subsView");box.innerHTML="";
+  if(!me){loginBox(box,"Entra a tu cuenta para ver los videos de los canales que sigues.");return}
+  var names=mySubs();
+  if(!names.length){box.appendChild(emptyBox("Aún no sigues a ningún canal","Entra a un canal y pulsa «Suscribirse»."));return}
+  var cr=el("div","chipsrow");
+  names.forEach(function(n){var c=el("button","chip");c.type="button";var av=el("div","av",initial(n));av.style.setProperty("--h",hue(n));fillAv(av,n);c.appendChild(av);c.appendChild(document.createTextNode(n));c.onclick=function(){goChan(n)};cr.appendChild(c)});
+  box.appendChild(cr);
+  var set={};names.forEach(function(n){set[ukey(n)]=1});
+  var a=VIDEOS.filter(function(v){return !v.short&&set[ukey(v.c)]}).sort(function(x,y){return (x.d-y.d)||(y.v-x.v)});
+  if(!a.length){box.appendChild(emptyBox("Sin videos todavía","Los canales que sigues aún no han subido videos."));return}
+  var g=el("div","grid");a.forEach(function(v){g.appendChild(cardEl(v))});box.appendChild(g);
+}
 
 /* ---- Shorts ---- */
 function pauseShorts(){
@@ -985,7 +1415,8 @@ function refreshAcct(){
   var b=$("#acct");b.textContent="";
   if(me){b.className="acct";var d=el("span","dot",initial(me));var src=avSrc(me);if(src){d.textContent="";var im=el("img");im.src=src;im.alt="";d.appendChild(im)}b.appendChild(d);b.appendChild(el("span","nm",me))}
   else{b.className="acct out";b.textContent="Iniciar sesión"}
-  if(cur&&$("#watch").open)renderComments();
+  LIKED=null;paintSubBtn();
+  if(cur&&$("#watch").open){renderComments();paintLike()}
   if(commMode()!==null)renderComm();
 }
 function setMode(m){
